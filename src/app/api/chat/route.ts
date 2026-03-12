@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { chat, type AIMessage } from "@/lib/ai";
+import { getRagContext } from "@/lib/rag";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -51,8 +52,11 @@ export async function POST(req: NextRequest) {
     content: m.content,
   }));
 
+  // Get RAG context
+  const ragContext = await getRagContext(bot.id, message);
+
   // Get AI response (streaming)
-  const stream = await chat("gemini", bot.systemPrompt, messages);
+  const stream = await chat("gemini", bot.systemPrompt, messages, ragContext);
 
   // Collect full response for saving
   let fullResponse = "";
