@@ -88,8 +88,28 @@ export async function chat(
   messages: AIMessage[],
   ragContext?: string
 ): Promise<ReadableStream<string>> {
-  if (provider === "groq") {
-    return chatWithGroq(systemPrompt, messages, ragContext);
+  // Try primary provider, fallback to the other one
+  try {
+    if (provider === "groq") {
+      return await chatWithGroq(systemPrompt, messages, ragContext);
+    }
+    return await chatWithGemini(systemPrompt, messages, ragContext);
+  } catch (primaryError) {
+    console.error(`${provider} xatosi, zaxira providerga o'tilmoqda:`, primaryError);
+    try {
+      if (provider === "gemini") {
+        return await chatWithGroq(systemPrompt, messages, ragContext);
+      }
+      return await chatWithGemini(systemPrompt, messages, ragContext);
+    } catch (fallbackError) {
+      console.error("Zaxira provider ham ishlamadi:", fallbackError);
+      // Return error as stream
+      return new ReadableStream({
+        start(controller) {
+          controller.enqueue("⚠️ AI xizmati hozir ishlamayapti. Iltimos, keyinroq urinib ko'ring yoki administratorga murojaat qiling.");
+          controller.close();
+        },
+      });
+    }
   }
-  return chatWithGemini(systemPrompt, messages, ragContext);
 }

@@ -62,7 +62,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ id: user.id, phone: user.phone });
-  } catch {
+  } catch (error) {
+    console.error("Register error:", error);
     return NextResponse.json(
       { error: "Xatolik yuz berdi" },
       { status: 500 }

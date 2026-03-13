@@ -14,8 +14,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.password) return null;
 
+        // Format phone to +998XXXXXXXXX
+        let phone = (credentials.phone as string).replace(/\D/g, "");
+        if (phone.startsWith("998")) {
+          phone = "+" + phone;
+        } else if (phone.length === 9) {
+          phone = "+998" + phone;
+        } else {
+          phone = "+998" + phone;
+        }
+
         const user = await prisma.user.findUnique({
-          where: { phone: credentials.phone as string },
+          where: { phone },
         });
 
         if (!user) return null;

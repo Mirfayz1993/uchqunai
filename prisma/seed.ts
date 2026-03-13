@@ -1,7 +1,27 @@
+import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { initialBots } from "../src/data/bots";
 
-const prisma = new PrismaClient();
+function getDirectDbUrl(): string {
+  const url = process.env.DATABASE_URL!;
+  if (url.startsWith("prisma+postgres://")) {
+    try {
+      const parsed = new URL(url);
+      const apiKey = parsed.searchParams.get("api_key");
+      if (apiKey) {
+        const decoded = JSON.parse(Buffer.from(apiKey, "base64").toString());
+        return decoded.databaseUrl;
+      }
+    } catch {
+      // fallback
+    }
+  }
+  return url;
+}
+
+const adapter = new PrismaPg({ connectionString: getDirectDbUrl() });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Botlar kiritilmoqda...");

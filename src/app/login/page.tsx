@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
@@ -61,9 +62,8 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <Input
+            <PasswordInput
               name="password"
-              type="password"
               placeholder="Parol"
               required
             />

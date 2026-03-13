@@ -52,8 +52,13 @@ export async function POST(req: NextRequest) {
     content: m.content,
   }));
 
-  // Get RAG context
-  const ragContext = await getRagContext(bot.id, message);
+  // Get RAG context (don't fail if RAG errors)
+  let ragContext = "";
+  try {
+    ragContext = await getRagContext(bot.id, message);
+  } catch (ragError) {
+    console.error("RAG xatosi (davom etilmoqda):", ragError);
+  }
 
   // Get AI response (streaming)
   const stream = await chat("gemini", bot.systemPrompt, messages, ragContext);
@@ -69,13 +74,17 @@ export async function POST(req: NextRequest) {
     },
     async flush() {
       // Save assistant message after stream completes
-      await prisma.message.create({
-        data: {
-          conversationId: convId,
-          role: "assistant",
-          content: fullResponse,
-        },
-      });
+      try {
+        await prisma.message.create({
+          data: {
+            conversationId: convId,
+            role: "assistant",
+            content: fullResponse,
+          },
+        });
+      } catch (saveError) {
+        console.error("Javob saqlash xatosi:", saveError);
+      }
     },
   });
 
