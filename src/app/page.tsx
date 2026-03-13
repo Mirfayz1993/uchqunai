@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialBots } from "@/data/bots";
@@ -9,8 +10,9 @@ export default function HomePage() {
     <div className="flex flex-col">
       {/* Hero */}
       <section className="flex flex-col items-center justify-center gap-6 py-20 px-4 text-center">
+        <Image src="/logo.png" alt="UchqunAI" width={100} height={100} className="object-contain" />
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          <span className="text-2xl sm:text-4xl">⚡</span> UchqunAI
+          Uchqun.ai
         </h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           O&apos;zbekiston sharoitiga ixtisoslashgan sun&apos;iy intellekt

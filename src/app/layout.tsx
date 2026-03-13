@@ -15,9 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "UchqunAI — O'zbekiston uchun AI Assistent",
+  title: "Uchqun.ai — O'zbekiston uchun AI Assistent",
   description:
     "O'zbekiston sharoitiga ixtisoslashgan sun'iy intellekt yordamchilari. Huquq, soliq, tibbiyot, dasturlash va boshqa sohalarda maslahat oling.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
