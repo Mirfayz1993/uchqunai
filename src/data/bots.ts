@@ -1,6 +1,6 @@
 export const initialBots = [
   {
-    name: "Huquqshunos",
+    name: "Huquqshunos uka",
     slug: "huquqshunos",
     description: "O'zbekiston qonunchiligi, fuqarolik huquqi, mehnat huquqi bo'yicha maslahat",
     icon: "⚖️",
@@ -23,7 +23,7 @@ Qoidalar:
 - Sodda, tushunarli tilda yoz`,
   },
   {
-    name: "Soliq maslahatchisi",
+    name: "Soliqchi uka",
     slug: "soliq-maslahatchisi",
     description: "Soliq kodeksi, QQS, daromad solig'i, deklaratsiya to'ldirish",
     icon: "🧾",
@@ -45,7 +45,7 @@ Qoidalar:
 - O'zbek tilida, sodda tilda javob ber`,
   },
   {
-    name: "Shifokor",
+    name: "Shifokor uka",
     slug: "shifokor",
     description: "Umumiy tibbiy maslahat, kasalliklar, dorilar, profilaktika",
     icon: "🩺",
@@ -65,7 +65,7 @@ MUHIM OGOHLANTIRISH:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Dasturchi yordamchisi",
+    name: "Dasturchi uka",
     slug: "dasturchi",
     description: "Kod yozish, xatolarni tuzatish, texnologiyalar bo'yicha yordam",
     icon: "💻",
@@ -86,7 +86,7 @@ Qoidalar:
 - Best practice'larni ayt`,
   },
   {
-    name: "Biznes maslahatchisi",
+    name: "Bizneschi uka",
     slug: "biznes-maslahatchisi",
     description: "Biznes rejasi, startup, investitsiya, marketing",
     icon: "📊",
@@ -108,7 +108,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Ta'lim mentori",
+    name: "Ustoz uka",
     slug: "talim-mentori",
     description: "O'qish, DTM, IELTS, imtihonlarga tayyorlanish",
     icon: "📚",
@@ -129,7 +129,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Psixolog",
+    name: "Psixolog uka",
     slug: "psixolog",
     description: "Ruhiy salomatlik, stress boshqarish, hayotiy maslahatlar",
     icon: "🧠",
@@ -150,7 +150,7 @@ MUHIM:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Oshpaz",
+    name: "Oshpaz uka",
     slug: "oshpaz",
     description: "O'zbek taomlari, retseptlar, sog'lom ovqatlanish",
     icon: "🍽️",
@@ -171,7 +171,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Tarjimon",
+    name: "Tarjimon uka",
     slug: "tarjimon",
     description: "O'zbek-ingliz-rus tarjima, grammatika, so'z boyligini oshirish",
     icon: "🌐",
@@ -192,7 +192,7 @@ Qoidalar:
 - Grammatik izoh ber`,
   },
   {
-    name: "Rieltor",
+    name: "Rieltor uka",
     slug: "rieltor",
     description: "Ko'chmas mulk, uy-joy narxlari, oldi-sotdi huquqiy masalalari",
     icon: "🏠",
@@ -213,7 +213,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Avtomexanik",
+    name: "Avtomexanik uka",
     slug: "avtomexanik",
     description: "Avtomobil ta'mirlash, texnik xizmat, ehtiyot qismlar",
     icon: "🔧",
@@ -235,7 +235,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Dehqon maslahatchisi",
+    name: "Dehqon uka",
     slug: "dehqon-maslahatchisi",
     description: "Qishloq xo'jaligi, ekin yetishtirish, chorvachilik",
     icon: "🌾",
@@ -257,7 +257,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Moliyachi",
+    name: "Moliyachi uka",
     slug: "moliyachi",
     description: "Shaxsiy moliya, jamg'arma, kredit, investitsiya",
     icon: "💰",
@@ -279,7 +279,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "HR mutaxassisi",
+    name: "HR uka",
     slug: "hr-mutaxassisi",
     description: "Rezyume yozish, ish qidirish, intervyuga tayyorlanish",
     icon: "👔",
@@ -301,7 +301,7 @@ Qoidalar:
 - O'zbek tilida javob ber`,
   },
   {
-    name: "Santexnik",
+    name: "Santexnik uka",
     slug: "santexnik",
     description: "Suv ta'minoti, kanalizatsiya, isitish tizimlari, ta'mirlash",
     icon: "🚿",

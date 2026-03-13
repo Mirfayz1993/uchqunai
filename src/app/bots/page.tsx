@@ -9,9 +9,9 @@ export default function BotsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">AI Yordamchilar</h1>
+        <h1 className="text-3xl font-bold">AI Ukalar</h1>
         <p className="text-muted-foreground mt-2">
-          O&apos;z sohasini chuqur biladigan ixtisoslashgan botlar
+          O&apos;z sohasini chuqur biladigan ixtisoslashgan ukalar
         </p>
       </div>
 

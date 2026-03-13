@@ -18,7 +18,7 @@ export default function HomePage() {
         </p>
         <div className="flex gap-4">
           <Link href="/bots">
-            <Button size="lg">Botlarni ko&apos;rish</Button>
+            <Button size="lg">Ukalarni ko&apos;rish</Button>
           </Link>
           <Link href="/register">
             <Button variant="outline" size="lg">
@@ -31,7 +31,7 @@ export default function HomePage() {
       {/* Bot cards */}
       <section className="container mx-auto px-4 pb-20">
         <h2 className="text-2xl font-bold text-center mb-8">
-          Ixtisoslashgan yordamchilar
+          Ixtisoslashgan ukalar
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {initialBots.slice(0, 8).map((bot) => (
@@ -51,7 +51,7 @@ export default function HomePage() {
         <div className="text-center mt-8">
           <Link href="/bots">
             <Button variant="outline">
-              Barcha botlarni ko&apos;rish ({initialBots.length} ta)
+              Barcha ukalarni ko&apos;rish ({initialBots.length} ta)
             </Button>
           </Link>
         </div>

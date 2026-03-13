@@ -22,7 +22,7 @@ export default async function HistoryPage() {
         <div className="text-center text-muted-foreground py-20">
           <p>Hali suhbatlar yo&apos;q.</p>
           <Link href="/bots" className="text-primary hover:underline">
-            Bot tanlang va suhbat boshlang
+            Uka tanlang va suhbat boshlang
           </Link>
         </div>
       ) : (

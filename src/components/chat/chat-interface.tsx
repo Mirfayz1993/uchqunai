@@ -109,7 +109,7 @@ export function ChatInterface({ botSlug, botName, botIcon }: ChatInterfaceProps)
         <span className="text-2xl">{botIcon}</span>
         <div>
           <h2 className="font-semibold">{botName}</h2>
-          <p className="text-xs text-muted-foreground">AI yordamchi</p>
+          <p className="text-xs text-muted-foreground">AI uka</p>
         </div>
       </div>
 

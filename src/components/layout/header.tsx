@@ -17,7 +17,7 @@ export function Header() {
 
         <nav className="flex items-center gap-4">
           <Link href="/bots" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Botlar
+            Ukalar
           </Link>
           {session ? (
             <>
