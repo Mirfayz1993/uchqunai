@@ -3,6 +3,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { YouTubeEmbed } from "./youtube-embed";
+import { removeDocumentMarkers } from "./document-download";
 import type { Components } from "react-markdown";
 
 type MarkdownMessageProps = {
@@ -122,7 +123,7 @@ export function MarkdownMessage({ content, role }: MarkdownMessageProps) {
   return (
     <div className="text-sm prose-sm max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {content}
+        {removeDocumentMarkers(content)}
       </ReactMarkdown>
     </div>
   );

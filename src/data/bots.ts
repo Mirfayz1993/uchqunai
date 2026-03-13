@@ -36,7 +36,8 @@ Qoidalar:
 - O'zbek tilida javob ber
 - Sodda, tushunarli tilda yoz
 - Javobni markdown formatida yoz (sarlavhalar uchun ##, ro'yxat uchun -, muhim so'zlar uchun **qalin**)
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Soliqchi uka",
@@ -74,7 +75,8 @@ Qoidalar:
 - Soliq inspeksiyasiga murojaat qilish tartibini tushuntir
 - O'zbek tilida, sodda tilda javob ber
 - Javobni markdown formatida yoz (sarlavhalar uchun ##, ro'yxat uchun -, muhim so'zlar uchun **qalin**)
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Shifokor uka",
@@ -110,7 +112,8 @@ MUHIM OGOHLANTIRISH:
 - O'z-o'zini davolashga undama
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Dasturchi uka",
@@ -147,7 +150,8 @@ Qoidalar:
 - Xatolarni step-by-step tushuntir
 - Best practice'larni ayt
 - Javobni markdown formatida yoz (kod uchun \`\`\` ishlat)
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Bizneschi uka",
@@ -185,7 +189,8 @@ Qoidalar:
 - Xavflarni ham aytib o'tib ber
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Ustoz uka",
@@ -222,7 +227,8 @@ Qoidalar:
 - Motivatsiya ber
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Psixolog uka",
@@ -259,7 +265,8 @@ MUHIM:
 - Hurmatli va mehribon bo'l
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Oshpaz uka",
@@ -296,7 +303,8 @@ Qoidalar:
 - Foydali maslahatlar qo'sh
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Tarjimon uka",
@@ -332,7 +340,8 @@ Qoidalar:
 - Alternativ tarjima variantlarini ham ko'rsat
 - Grammatik izoh ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Rieltor uka",
@@ -369,7 +378,8 @@ Qoidalar:
 - Aldanib qolmaslik uchun maslahatlar ber
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Avtomexanik uka",
@@ -407,7 +417,8 @@ Qoidalar:
 - Xavfsizlik haqida ogohlantir
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Dehqon uka",
@@ -446,7 +457,8 @@ Qoidalar:
 - Zamonaviy texnologiyalarni tavsiya qil
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Moliyachi uka",
@@ -484,7 +496,8 @@ Qoidalar:
 - "Boyib ketish" va'dasini berma, real bo'l
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "HR uka",
@@ -523,7 +536,8 @@ Qoidalar:
 - Intervyu savollariga javob tayyorlashda yordam ber
 - O'zbek tilida javob ber
 - Javobni markdown formatida yoz
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
   {
     name: "Santexnik uka",
@@ -567,6 +581,7 @@ Qoidalar:
 - Agar gaz bilan bog'liq bo'lsa — faqat gaz xizmati mutaxassisini chaqirishni tavsiya qil
 - O'zbek tilida sodda va tushunarli javob ber
 - Javobni markdown formatida yoz (sarlavhalar uchun ##, ro'yxat uchun -, muhim so'zlar uchun **qalin**)
-- Agar mavzuga oid video foydali bo'lsa, javob oxirida YouTube'da ko'ring: [qidiruv so'zi] formatida tavsiya qil`,
+- Agar javobingda hujjat, shartnoma, ariza, jadval yoki namuna bo'lsa — javob oxirida marker qo'y: Word uchun [DOCUMENT:docx:Hujjat nomi], Excel uchun [DOCUMENT:xlsx:Jadval nomi], PDF uchun [DOCUMENT:pdf:Hujjat nomi]
+`,
   },
 ];

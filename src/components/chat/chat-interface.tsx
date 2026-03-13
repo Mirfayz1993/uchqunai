@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MarkdownMessage } from "./markdown-message";
 import { VideoSuggestions } from "./video-suggestions";
+import { DocumentDownload } from "./document-download";
 
 type Message = {
   role: "user" | "assistant";
@@ -165,9 +166,10 @@ export function ChatInterface({
                   <MarkdownMessage content={msg.content} role={msg.role} />
                 </div>
               </div>
-              {/* Video tavsiyalari — faqat assistant javoblarida, streaming tugagandan keyin */}
+              {/* Hujjat yuklab olish va video tavsiyalari — faqat assistant javoblarida, streaming tugagandan keyin */}
               {msg.role === "assistant" && msg.content && !loading && (
                 <div className="ml-0 max-w-[80%]">
+                  <DocumentDownload content={msg.content} />
                   <VideoSuggestions botSlug={botSlug} content={msg.content} />
                 </div>
               )}
