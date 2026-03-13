@@ -20,13 +20,13 @@ export default function LoginPage() {
 
     const formData = new FormData(e.currentTarget);
     const result = await signIn("credentials", {
-      email: formData.get("email"),
+      phone: formData.get("phone"),
       password: formData.get("password"),
       redirect: false,
     });
 
     if (result?.error) {
-      setError("Email yoki parol noto'g'ri");
+      setError("Telefon raqam yoki parol noto'g'ri");
       setLoading(false);
     } else {
       router.push("/bots");
@@ -48,12 +48,19 @@ export default function LoginPage() {
             {error && (
               <p className="text-sm text-red-500 text-center">{error}</p>
             )}
-            <Input
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                +998
+              </span>
+              <Input
+                name="phone"
+                type="tel"
+                placeholder="90 123 45 67"
+                className="pl-14"
+                maxLength={12}
+                required
+              />
+            </div>
             <Input
               name="password"
               type="password"

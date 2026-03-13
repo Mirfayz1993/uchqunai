@@ -20,13 +20,13 @@ export default function RegisterPage() {
 
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
     const password = formData.get("password") as string;
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, phone, password }),
     });
 
     if (!res.ok) {
@@ -38,7 +38,7 @@ export default function RegisterPage() {
 
     // Auto login after registration
     await signIn("credentials", {
-      email,
+      phone,
       password,
       redirect: false,
     });
@@ -67,12 +67,19 @@ export default function RegisterPage() {
               placeholder="Ismingiz"
               required
             />
-            <Input
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                +998
+              </span>
+              <Input
+                name="phone"
+                type="tel"
+                placeholder="90 123 45 67"
+                className="pl-14"
+                maxLength={12}
+                required
+              />
+            </div>
             <Input
               name="password"
               type="password"
