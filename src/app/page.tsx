@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialBots } from "@/data/bots";
+import { SmartInput } from "@/components/home/smart-input";
 
 export default function HomePage() {
   return (
@@ -16,14 +17,13 @@ export default function HomePage() {
           yordamchilari. Huquq, soliq, tibbiyot, dasturlash va boshqa sohalarda
           maslahat oling.
         </p>
+
+        {/* Smart Input */}
+        <SmartInput />
+
         <div className="flex gap-4">
           <Link href="/bots">
-            <Button size="lg">Ukalarni ko&apos;rish</Button>
-          </Link>
-          <Link href="/register">
-            <Button variant="outline" size="lg">
-              Bepul boshlash
-            </Button>
+            <Button variant="outline" size="lg">Barcha ukalarni ko&apos;rish</Button>
           </Link>
         </div>
       </section>
