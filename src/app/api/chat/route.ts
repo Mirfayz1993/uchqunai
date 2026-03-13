@@ -60,11 +60,17 @@ export async function POST(req: NextRequest) {
     console.error("RAG xatosi (davom etilmoqda):", ragError);
   }
 
-  // Birinchi xabar uchun system promptga qo'shimcha ko'rsatma
-  const isFirstMessage = messages.filter((m) => m.role === "user").length === 1;
+  // Aniqlashtiruvchi savollar bosqichi — etarli ma'lumot to'planguncha
+  const userMessageCount = messages.filter((m) => m.role === "user").length;
   let systemPrompt = bot.systemPrompt;
-  if (isFirstMessage) {
-    systemPrompt += `\n\n⚠️ HOZIRGI HOLAT: Bu foydalanuvchining BIRINCHI xabari. Suhbatda faqat 1 ta user xabari bor. Sen FAQAT aniqlashtiruvchi savollar berishing SHART. Hech qanday yechim, maslahat yoki umumiy ma'lumot BERMA. Faqat savollar ber!`;
+  if (userMessageCount <= 2) {
+    systemPrompt += `\n\n⚠️ HOZIRGI HOLAT: Suhbatda hali faqat ${userMessageCount} ta foydalanuvchi xabari bor. Bu YETARLI EMAS to'liq javob berish uchun.
+Sen hali aniqlashtirish bosqichidasan. QOIDALAR:
+1. Agar foydalanuvchi hali barcha kerakli ma'lumotni bermagan bo'lsa — FAQAT 3-4 ta aniqlashtiruvchi savol ber, HECH QANDAY yechim yoki maslahat BERMA.
+2. Har bir javobda 3-4 ta savol bo'lishi SHART.
+3. Savollardan oldin qisqa "Tushundim, yana bir necha savol:" deb yoz.
+4. FAQAT foydalanuvchi barcha muhim tafsilotlarni (turi, modeli, joylashuvi, muammo tafsiloti) batafsil aytgandan keyingina to'liq javob ber.
+5. Agar foydalanuvchi qisqa javob bergan bo'lsa (1-2 so'z) — bu YETARLI EMAS, yana savollar ber.`;
   }
 
   // Get AI response (streaming)
