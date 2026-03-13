@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MarkdownMessage } from "./markdown-message";
+import { VideoSuggestions } from "./video-suggestions";
 
 type Message = {
   role: "user" | "assistant";
@@ -149,19 +151,26 @@ export function ChatInterface({
         )}
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-            >
+            <div key={i}>
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                  msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                }`}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                    msg.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  <MarkdownMessage content={msg.content} role={msg.role} />
+                </div>
               </div>
+              {/* Video tavsiyalari — faqat assistant javoblarida, streaming tugagandan keyin */}
+              {msg.role === "assistant" && msg.content && !loading && (
+                <div className="ml-0 max-w-[80%]">
+                  <VideoSuggestions botSlug={botSlug} content={msg.content} />
+                </div>
+              )}
             </div>
           ))}
           {loading && messages[messages.length - 1]?.role !== "assistant" && (
