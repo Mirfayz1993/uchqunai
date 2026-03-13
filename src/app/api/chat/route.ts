@@ -60,8 +60,15 @@ export async function POST(req: NextRequest) {
     console.error("RAG xatosi (davom etilmoqda):", ragError);
   }
 
+  // Birinchi xabar uchun system promptga qo'shimcha ko'rsatma
+  const isFirstMessage = messages.filter((m) => m.role === "user").length === 1;
+  let systemPrompt = bot.systemPrompt;
+  if (isFirstMessage) {
+    systemPrompt += `\n\n⚠️ HOZIRGI HOLAT: Bu foydalanuvchining BIRINCHI xabari. Suhbatda faqat 1 ta user xabari bor. Sen FAQAT aniqlashtiruvchi savollar berishing SHART. Hech qanday yechim, maslahat yoki umumiy ma'lumot BERMA. Faqat savollar ber!`;
+  }
+
   // Get AI response (streaming)
-  const stream = await chat("gemini", bot.systemPrompt, messages, ragContext);
+  const stream = await chat("gemini", systemPrompt, messages, ragContext);
 
   // Collect full response for saving
   let fullResponse = "";
