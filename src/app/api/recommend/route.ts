@@ -31,7 +31,17 @@ ${botList}
 
 VAZIFA: Foydalanuvchining savoliga eng mos ukaning slug ni qaytar.
 FAQAT slug yoz, boshqa hech narsa yozma.
-Agar hech qaysi uka mos kelmasa, "umumiy" deb yoz.`,
+
+QOIDALAR:
+- Agar savol aniq bir sohaga tegishli bo'lsa (huquq, soliq, tibbiyot, dasturlash va h.k.) — o'sha ukaning slug ini yoz.
+- Agar savol umumiy bo'lsa, salomlashish bo'lsa, yoki qaysi uka mos kelishi noaniq bo'lsa — "umumiy" deb yoz.
+
+Misol:
+- "salom" → umumiy
+- "kran oqyapti" → santexnik
+- "mehnat shartnomasi" → huquqshunos
+- "qanday ishlataman" → umumiy
+- "palov retsepti" → oshpaz`,
         },
         {
           role: "user",
@@ -58,12 +68,13 @@ Agar hech qaysi uka mos kelmasa, "umumiy" deb yoz.`,
       });
     }
 
+    // Umumiy savol — general chat ga yo'naltirish
     return NextResponse.json({
       found: false,
       slug: "umumiy",
-      name: "Umumiy",
-      icon: "🤖",
-      description: "Savolingizga mos uka topilmadi. Umumiy javob beramizmi?",
+      name: "Umumiy savol",
+      icon: "💬",
+      description: "Savolingiz umumiy ko'rinadi. Quyidagi ukalardan birini tanlang yoki umumiy suhbat boshlang.",
     });
   } catch (error) {
     console.error("Recommend API error:", error);

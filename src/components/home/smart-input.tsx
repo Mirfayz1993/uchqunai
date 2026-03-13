@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { initialBots } from "@/data/bots";
 
 type Recommendation = {
   found: boolean;
@@ -46,7 +48,7 @@ export function SmartInput() {
         slug: "umumiy",
         name: "Xatolik",
         icon: "⚠️",
-        description: "AI xizmati vaqtinchalik ishlamayapti. Iltimos, ukalardan birini tanlang.",
+        description: "AI xizmati vaqtinchalik ishlamayapti.",
       });
     }
 
@@ -70,6 +72,9 @@ export function SmartInput() {
     setInput("");
     setUserMessage("");
   }
+
+  // Top 6 ukalar — umumiy holat uchun
+  const topBots = initialBots.slice(0, 6);
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -106,27 +111,22 @@ export function SmartInput() {
         </div>
       ) : (
         <Card className="p-6">
-          <div className="text-center space-y-4">
+          <div className="space-y-4">
             {/* User message */}
-            <div className="bg-muted rounded-xl px-4 py-3 text-sm text-left">
+            <div className="bg-muted rounded-xl px-4 py-3 text-sm">
               <span className="text-muted-foreground text-xs">Sizning savolingiz:</span>
               <p className="mt-1">{userMessage}</p>
             </div>
 
             {recommendation.found ? (
-              <>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Sizga eng mos uka:
-                  </p>
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-4xl">{recommendation.icon}</span>
-                    <div className="text-left">
-                      <h3 className="font-bold text-lg">{recommendation.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {recommendation.description}
-                      </p>
-                    </div>
+              /* Aniq uka topildi */
+              <div className="text-center space-y-4">
+                <p className="text-sm text-muted-foreground">Sizga eng mos uka:</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-4xl">{recommendation.icon}</span>
+                  <div className="text-left">
+                    <h3 className="font-bold text-lg">{recommendation.name}</h3>
+                    <p className="text-sm text-muted-foreground">{recommendation.description}</p>
                   </div>
                 </div>
                 <div className="flex gap-3 justify-center">
@@ -137,24 +137,45 @@ export function SmartInput() {
                     Boshqa savol
                   </Button>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
-                <div className="space-y-2">
-                  <span className="text-4xl">🤔</span>
-                  <p className="text-sm text-muted-foreground">
-                    {recommendation.description}
+              /* Umumiy savol — ukalar tanlovi */
+              <div className="space-y-4">
+                <div className="text-center">
+                  <span className="text-3xl">👋</span>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Qaysi sorada yordam kerak? Ukani tanlang:
                   </p>
                 </div>
-                <div className="flex gap-3 justify-center flex-wrap">
-                  <Button variant="outline" onClick={() => router.push("/bots")} size="lg">
-                    Barcha ukalarni ko&apos;rish
-                  </Button>
-                  <Button variant="outline" onClick={handleReset} size="lg">
-                    Boshqa savol
+
+                {/* Ukalar grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {topBots.map((bot) => (
+                    <button
+                      key={bot.slug}
+                      onClick={() => handleGoToChat(bot.slug)}
+                      className="flex items-center gap-2 p-3 rounded-xl border hover:bg-muted transition-colors text-left"
+                    >
+                      <span className="text-xl">{bot.icon}</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{bot.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{bot.category}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-3 justify-center pt-1">
+                  <Link href="/bots">
+                    <Button variant="outline" size="sm">
+                      Barcha ukalar ({initialBots.length} ta)
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" onClick={handleReset}>
+                    Qayta yozish
                   </Button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </Card>
