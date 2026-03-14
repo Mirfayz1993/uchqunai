@@ -1,17 +1,61 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 import { MarkdownMessage } from "./markdown-message";
 import { VideoSuggestions } from "./video-suggestions";
 import { DocumentDownload } from "./document-download";
+
+type UkaSuggestion = { slug: string; name: string } | null;
+
+function extractUkaSuggestion(content: string): UkaSuggestion {
+  const match = content.match(/\[UKA:([a-z0-9-]+):([^\]]+)\]/);
+  if (!match) return null;
+  return { slug: match[1], name: match[2] };
+}
+
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
+
+function AssistantExtras({
+  content,
+  botSlug,
+  messages,
+  onNavigate,
+}: {
+  content: string;
+  botSlug: string;
+  messages: Message[];
+  onNavigate: (slug: string, q: string) => void;
+}) {
+  const ukaSuggestion = extractUkaSuggestion(content);
+  const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content || "";
+
+  return (
+    <div className="max-w-[80%] space-y-2 mt-2">
+      <DocumentDownload content={content} />
+      {ukaSuggestion && (
+        <Card className="p-3 border-primary/30 bg-primary/5">
+          <p className="text-sm text-muted-foreground mb-2">
+            Sizga quyidagi ixtisoslashgan uka ko&apos;proq yordam bera oladi:
+          </p>
+          <Button size="sm" onClick={() => onNavigate(ukaSuggestion.slug, lastUserMsg)}>
+            {ukaSuggestion.name} bilan davom etish →
+          </Button>
+        </Card>
+      )}
+      <VideoSuggestions botSlug={botSlug} content={content} />
+    </div>
+  );
+}
 
 type ChatInterfaceProps = {
   botSlug: string;
@@ -36,6 +80,14 @@ export function ChatInterface({
   );
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialMessageSent = useRef(false);
+  const messagesRef = useRef<Message[]>([]);
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  // messagesRef ni doim yangilab turish
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const sendMessage = useCallback(
     async (userMessage: string) => {
@@ -52,6 +104,8 @@ export function ChatInterface({
             message: userMessage,
             botSlug,
             conversationId,
+            // Guest uchun tarix clientdan yuboriladi (ref orqali eng yangi holat)
+            clientMessages: messagesRef.current,
           }),
         });
 
@@ -133,13 +187,13 @@ export function ChatInterface({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-full">
       {/* Chat header */}
-      <div className="border-b px-4 py-3 flex items-center gap-3">
+      <div className="border-b border-primary/10 bg-primary/5 px-4 py-3 flex items-center gap-3">
         <span className="text-2xl">{botIcon}</span>
         <div>
-          <h2 className="font-semibold">{botName}</h2>
-          <p className="text-xs text-muted-foreground">AI uka</p>
+          <h2 className="font-semibold text-primary">{botName}</h2>
+          <p className="text-sm text-muted-foreground">AI uka • Uchqun.ai</p>
         </div>
       </div>
 
@@ -157,28 +211,37 @@ export function ChatInterface({
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     msg.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted border border-primary/8"
                   }`}
                 >
                   <MarkdownMessage content={msg.content} role={msg.role} />
                 </div>
               </div>
-              {/* Hujjat yuklab olish va video tavsiyalari — faqat assistant javoblarida, streaming tugagandan keyin */}
+              {/* Hujjat yuklab olish, uka tavsiya va video tavsiyalari */}
               {msg.role === "assistant" && msg.content && !loading && (
-                <div className="ml-0 max-w-[80%]">
-                  <DocumentDownload content={msg.content} />
-                  <VideoSuggestions botSlug={botSlug} content={msg.content} />
-                </div>
+                <AssistantExtras
+                  content={msg.content}
+                  botSlug={botSlug}
+                  messages={messages}
+                  onNavigate={(slug, q) => {
+                    const chatUrl = `/chat/${slug}?q=${encodeURIComponent(q)}`;
+                    if (session) {
+                      router.push(chatUrl);
+                    } else {
+                      router.push(`/login?callbackUrl=${encodeURIComponent(chatUrl)}`);
+                    }
+                  }}
+                />
               )}
             </div>
           ))}
           {loading && messages[messages.length - 1]?.role !== "assistant" && (
             <div className="flex justify-start">
               <div className="bg-muted rounded-2xl px-4 py-2">
-                <p className="text-sm text-muted-foreground animate-pulse">
+                <p className="text-base text-muted-foreground animate-pulse">
                   Javob yozilmoqda...
                 </p>
               </div>

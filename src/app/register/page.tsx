@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/bots";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isFromChat = callbackUrl.startsWith("/chat/");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,15 +48,24 @@ export default function RegisterPage() {
       redirect: false,
     });
 
-    router.push("/bots");
+    router.push(callbackUrl);
     router.refresh();
   }
 
+  const loginUrl = `/login${callbackUrl !== "/bots" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`;
+
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
-      <Card className="w-full max-w-md">
+    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,oklch(0.95_0.04_294),transparent)]">
+      <Card className="w-full max-w-md border-primary/15 shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Ro&apos;yxatdan o&apos;tish</CardTitle>
+          {isFromChat && (
+            <div className="mb-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="text-sm text-primary font-medium">
+                💬 Ixtisoslashgan uka bilan gaplashish uchun ro&apos;yxatdan o&apos;ting
+              </p>
+            </div>
+          )}
+          <CardTitle className="text-2xl text-primary">Ro&apos;yxatdan o&apos;tish</CardTitle>
           <CardDescription>
             UchqunAI da yangi hisob yarating
           </CardDescription>
@@ -91,14 +104,26 @@ export default function RegisterPage() {
               {loading ? "Yaratilmoqda..." : "Hisob yaratish"}
             </Button>
           </form>
-          <p className="text-sm text-center text-muted-foreground mt-4">
-            Hisobingiz bormi?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Tizimga kiring
+          <div className="mt-4 pt-4 border-t text-center">
+            <p className="text-sm text-muted-foreground mb-2">
+              Hisobingiz bormi?
+            </p>
+            <Link href={loginUrl}>
+              <Button variant="outline" className="w-full">
+                Tizimga kirish
+              </Button>
             </Link>
-          </p>
+          </div>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }

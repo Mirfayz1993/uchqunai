@@ -28,7 +28,7 @@ function extractYouTubeId(url: string): string | null {
 export function MarkdownMessage({ content, role }: MarkdownMessageProps) {
   // User xabarlari uchun oddiy matn
   if (role === "user") {
-    return <p className="whitespace-pre-wrap text-sm">{content}</p>;
+    return <p className="whitespace-pre-wrap text-[15px]">{content}</p>;
   }
 
   const components: Components = {
@@ -60,42 +60,42 @@ export function MarkdownMessage({ content, role }: MarkdownMessageProps) {
     },
     // Boshqa elementlarni stilizatsiya qilish
     p: ({ children }) => (
-      <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+      <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
     ),
     strong: ({ children }) => (
       <strong className="font-bold">{children}</strong>
     ),
     ul: ({ children }) => (
-      <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+      <ul className="list-disc list-inside mb-3 space-y-1.5">{children}</ul>
     ),
     ol: ({ children }) => (
-      <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+      <ol className="list-decimal list-inside mb-3 space-y-1.5">{children}</ol>
     ),
     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
     code: ({ children, className }) => {
       const isInline = !className;
       if (isInline) {
         return (
-          <code className="bg-background/50 border rounded px-1.5 py-0.5 text-xs font-mono">
+          <code className="bg-background/50 border rounded px-1.5 py-0.5 text-sm font-mono">
             {children}
           </code>
         );
       }
       return (
-        <code className="block bg-background/50 border rounded-lg p-3 text-xs font-mono overflow-x-auto my-2">
+        <code className="block bg-background/50 border rounded-lg p-3 text-sm font-mono overflow-x-auto my-2">
           {children}
         </code>
       );
     },
     pre: ({ children }) => <pre className="my-2">{children}</pre>,
     h1: ({ children }) => (
-      <h1 className="text-lg font-bold mb-2">{children}</h1>
+      <h1 className="text-xl font-bold mb-3">{children}</h1>
     ),
     h2: ({ children }) => (
-      <h2 className="text-base font-bold mb-2">{children}</h2>
+      <h2 className="text-lg font-bold mb-2">{children}</h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-sm font-bold mb-1">{children}</h3>
+      <h3 className="text-base font-bold mb-2">{children}</h3>
     ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-2 border-primary/50 pl-3 my-2 italic text-muted-foreground">
@@ -104,26 +104,26 @@ export function MarkdownMessage({ content, role }: MarkdownMessageProps) {
     ),
     hr: () => <hr className="my-3 border-border" />,
     table: ({ children }) => (
-      <div className="overflow-x-auto my-2">
-        <table className="min-w-full text-xs border-collapse border border-border">
+      <div className="overflow-x-auto my-3">
+        <table className="min-w-full text-sm border-collapse border border-border">
           {children}
         </table>
       </div>
     ),
     th: ({ children }) => (
-      <th className="border border-border bg-muted px-2 py-1 text-left font-semibold">
+      <th className="border border-border bg-muted px-3 py-1.5 text-left font-semibold">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="border border-border px-2 py-1">{children}</td>
+      <td className="border border-border px-3 py-1.5">{children}</td>
     ),
   };
 
   return (
-    <div className="text-sm prose-sm max-w-none">
+    <div className="text-[15px] max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {removeDocumentMarkers(content)}
+        {removeDocumentMarkers(content).replace(/\[UKA:[^\]]+\]/g, "").trim()}
       </ReactMarkdown>
     </div>
   );

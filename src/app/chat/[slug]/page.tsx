@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { ChatInterface } from "@/components/chat/chat-interface";
+import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { initialBots } from "@/data/bots";
 
 type Props = {
@@ -10,10 +11,15 @@ type Props = {
 
 export default async function ChatPage({ params, searchParams }: Props) {
   const session = await auth();
-  if (!session) redirect("/login");
-
   const { slug } = await params;
   const { q, conversation } = await searchParams;
+
+  // Umumiy chat — login talab qilmaydi; boshqa ukalar uchun login kerak
+  if (!session && slug !== "umumiy") {
+    const chatUrl = q ? `/chat/${slug}?q=${encodeURIComponent(q)}` : `/chat/${slug}`;
+    redirect(`/login?callbackUrl=${encodeURIComponent(chatUrl)}`);
+  }
+
   const bot = initialBots.find((b) => b.slug === slug);
 
   if (!bot) {
@@ -21,12 +27,26 @@ export default async function ChatPage({ params, searchParams }: Props) {
   }
 
   return (
-    <ChatInterface
-      botSlug={bot.slug}
-      botName={bot.name}
-      botIcon={bot.icon}
-      initialMessage={q}
-      conversationId={conversation}
-    />
+    <div className="flex h-[calc(100vh-4rem)]">
+      {/* Sidebar — faqat auth foydalanuvchilar uchun */}
+      {session && (
+        <ChatSidebar
+          botSlug={bot.slug}
+          botName={bot.name}
+          botIcon={bot.icon}
+          currentConversationId={conversation}
+        />
+      )}
+      {/* Chat */}
+      <div className="flex-1 min-w-0">
+        <ChatInterface
+          botSlug={bot.slug}
+          botName={bot.name}
+          botIcon={bot.icon}
+          initialMessage={q}
+          conversationId={conversation}
+        />
+      </div>
+    </div>
   );
 }

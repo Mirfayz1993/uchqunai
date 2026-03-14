@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const filename = `${title.replace(/[^a-zA-Z0-9\u0400-\u04FF\s]/g, "").replace(/\s+/g, "_")}.${extension}`;
 
-    return new Response(buffer, {
+    return new Response(buffer as unknown as BodyInit, {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": `attachment; filename="${encodeURIComponent(filename)}"`,
