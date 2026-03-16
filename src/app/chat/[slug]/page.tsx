@@ -27,7 +27,12 @@ export default async function ChatPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
+    <div className="flex h-[calc(100vh-4rem)] relative">
+      {/* Background subtle glow */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+        <div className="absolute top-[10%] right-[5%] w-36 sm:w-48 h-36 sm:h-48 bg-purple-400/3 dark:bg-[#8b5cf6]/5 rounded-full blur-[60px] sm:blur-[80px]" />
+        <div className="absolute bottom-[20%] left-[10%] w-40 sm:w-56 h-40 sm:h-56 bg-amber-300/2 dark:bg-[#fbbf24]/3 rounded-full blur-[80px] sm:blur-[100px]" />
+      </div>
       {/* Sidebar — faqat auth foydalanuvchilar uchun */}
       {session && (
         <ChatSidebar

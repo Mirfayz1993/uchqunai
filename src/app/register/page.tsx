@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 function RegisterForm() {
   const router = useRouter();
@@ -41,7 +40,6 @@ function RegisterForm() {
       return;
     }
 
-    // Auto login after registration
     await signIn("credentials", {
       phone,
       password,
@@ -55,67 +53,80 @@ function RegisterForm() {
   const loginUrl = `/login${callbackUrl !== "/bots" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`;
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,oklch(0.95_0.04_294),transparent)]">
-      <Card className="w-full max-w-md border-primary/15 shadow-lg">
-        <CardHeader className="text-center">
+    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 relative">
+      {/* Background effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[25%] right-[25%] w-48 sm:w-64 h-48 sm:h-64 bg-purple-400/5 dark:bg-[#8b5cf6]/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[25%] left-[30%] w-56 sm:w-72 h-56 sm:h-72 bg-amber-300/4 dark:bg-[#fbbf24]/5 rounded-full blur-[100px] sm:blur-[120px] animate-pulse" style={{ animationDelay: "2s" }} />
+      </div>
+
+      <div className="w-full max-w-md glass-card rounded-2xl p-5 sm:p-8 glow-purple relative z-10 fade-in-up">
+        <div className="text-center mb-5 sm:mb-6">
           {isFromChat && (
-            <div className="mb-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
-              <p className="text-sm text-primary font-medium">
-                💬 Ixtisoslashgan uka bilan gaplashish uchun ro&apos;yxatdan o&apos;ting
+            <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-[#fbbf24]/10 border border-amber-200/50 dark:border-[#fbbf24]/20">
+              <p className="text-sm text-amber-600 dark:text-[#fbbf24] font-medium">
+                ⚡ Ixtisoslashgan uka bilan gaplashish uchun ro&apos;yxatdan o&apos;ting
               </p>
             </div>
           )}
-          <CardTitle className="text-2xl text-primary">Ro&apos;yxatdan o&apos;tish</CardTitle>
-          <CardDescription>
-            UchqunAI da yangi hisob yarating
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
-            )}
-            <Input
-              name="name"
-              type="text"
-              placeholder="Ismingiz"
-              required
-            />
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                +998
-              </span>
-              <Input
-                name="phone"
-                type="tel"
-                placeholder="90 123 45 67"
-                className="pl-14"
-                maxLength={12}
-                required
-              />
+          <h1 className="text-2xl font-bold gradient-text">Ro&apos;yxatdan o&apos;tish</h1>
+          <p className="text-sm text-gray-500 dark:text-[#a78bfa]/50 mt-1">UchqunAI da yangi hisob yarating</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200/50 dark:border-red-500/20">
+              <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
             </div>
-            <PasswordInput
-              name="password"
-              placeholder="Parol (kamida 6 belgi)"
-              minLength={6}
+          )}
+          <Input
+            name="name"
+            type="text"
+            placeholder="Ismingiz"
+            className="glass-input border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
+            required
+          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-[#a78bfa]/50">
+              +998
+            </span>
+            <Input
+              name="phone"
+              type="tel"
+              placeholder="90 123 45 67"
+              className="pl-14 glass-input border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
+              maxLength={12}
               required
             />
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Yaratilmoqda..." : "Hisob yaratish"}
-            </Button>
-          </form>
-          <div className="mt-4 pt-4 border-t text-center">
-            <p className="text-sm text-muted-foreground mb-2">
-              Hisobingiz bormi?
-            </p>
-            <Link href={loginUrl}>
-              <Button variant="outline" className="w-full">
-                Tizimga kirish
-              </Button>
-            </Link>
           </div>
-        </CardContent>
-      </Card>
+          <PasswordInput
+            name="password"
+            placeholder="Parol (kamida 6 belgi)"
+            className="glass-input border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
+            minLength={6}
+            required
+          />
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] hover:from-purple-500 hover:to-purple-600 dark:hover:from-[#a78bfa] dark:hover:to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(124,58,237,0.2)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300"
+          >
+            {loading ? "Yaratilmoqda..." : "Hisob yaratish"}
+          </Button>
+        </form>
+
+        <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-purple-200/20 dark:border-[#8b5cf6]/10 text-center">
+          <p className="text-sm text-gray-400 dark:text-[#a78bfa]/40 mb-3">Hisobingiz bormi?</p>
+          <Link href={loginUrl}>
+            <Button
+              variant="outline"
+              className="w-full border-amber-300/40 dark:border-[#fbbf24]/30 text-amber-600 dark:text-[#fbbf24] hover:bg-amber-50 dark:hover:bg-[#fbbf24]/10 hover:border-amber-400 dark:hover:border-[#fbbf24]/50 transition-all duration-300"
+            >
+              Tizimga kirish
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

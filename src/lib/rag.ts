@@ -6,7 +6,7 @@ const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 // Generate embedding for text using Gemini
 export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await gemini.models.embedContent({
-    model: "text-embedding-004",
+    model: "gemini-embedding-001",
     contents: text,
   });
   return response.embeddings?.[0]?.values ?? [];
