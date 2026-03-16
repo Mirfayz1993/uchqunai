@@ -15,7 +15,7 @@ export default function HomePage() {
       </div>
 
       {/* Hero */}
-      <section className="relative flex flex-col items-center justify-center gap-6 sm:gap-8 py-16 sm:py-28 px-4 text-center">
+      <section className="relative flex flex-col items-center justify-center gap-4 sm:gap-6 py-8 sm:py-14 px-4 text-center">
         {/* Orbiting particles — hidden on mobile */}
         <div className="absolute inset-0 pointer-events-none hidden sm:block">
           <div className="absolute top-[20%] left-[15%] particle" style={{ animationDelay: "0s" }} />

@@ -87,8 +87,8 @@ export function SmartInput() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Savolingizni yozing... masalan: Mehnat shartnomasini qanday tuzaman?"
-                rows={3}
-                className="resize-none text-base sm:text-lg border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40"
+                rows={9}
+                className="resize-none text-base sm:text-lg border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[200px]"
                 disabled={loading}
               />
               <Button
@@ -107,9 +107,15 @@ export function SmartInput() {
               </Button>
             </div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-400 dark:text-[#a78bfa]/50 text-center">
-            <span className="text-amber-500 dark:text-[#fbbf24]">⚡</span> Savolingizni yozing — biz eng mos ukani topamiz
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-[#a78bfa]/50">
+              <span className="text-amber-500 dark:text-[#fbbf24]">⚡</span> Savolingizni yozing — biz eng mos ukani topamiz
+            </p>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-[#8b5cf6]/10 border border-purple-200/30 dark:border-[#8b5cf6]/20">
+              <span className="text-sm">💬</span>
+              <span className="text-xs font-medium text-purple-600 dark:text-[#a78bfa]">Umumiy yordamchi</span>
+            </div>
+          </div>
         </div>
       ) : (
         /* Recommendation card */
