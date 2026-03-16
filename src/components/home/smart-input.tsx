@@ -87,8 +87,8 @@ export function SmartInput() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Savolingizni yozing... masalan: Mehnat shartnomasini qanday tuzaman?"
-                rows={9}
-                className="resize-none text-base sm:text-lg border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[200px]"
+                rows={5}
+                className="resize-none !text-xl sm:!text-2xl border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[120px]"
                 disabled={loading}
               />
               <Button
