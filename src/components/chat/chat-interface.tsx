@@ -252,26 +252,29 @@ export function ChatInterface({
 
       {/* Input */}
       <div className="glass border-t border-purple-200/20 dark:border-[#8b5cf6]/10 p-3 sm:p-4">
-        <div className="max-w-3xl mx-auto flex gap-2">
-          <div className="relative flex-1 group/chat-input">
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-600 via-amber-500 to-purple-600 dark:from-[#8b5cf6] dark:via-[#fbbf24] dark:to-[#8b5cf6] rounded-xl opacity-0 group-focus-within/chat-input:opacity-30 dark:group-focus-within/chat-input:opacity-40 blur-sm transition-opacity duration-500 bg-[length:200%_auto] animate-[gradient-shift_3s_ease_infinite]" />
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Xabar yozing..."
-              rows={1}
-              className="relative resize-none min-h-[44px] glass-input border-purple-200/20 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
-              disabled={loading}
-            />
+        <div className="max-w-3xl mx-auto">
+          <div className="relative group/chat-input">
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-600 via-amber-500 to-purple-600 dark:from-[#8b5cf6] dark:via-[#fbbf24] dark:to-[#8b5cf6] rounded-2xl opacity-20 dark:opacity-30 group-focus-within/chat-input:opacity-50 dark:group-focus-within/chat-input:opacity-60 blur-sm transition-opacity duration-500 bg-[length:200%_auto] animate-[gradient-shift_3s_ease_infinite]" />
+            <div className="relative glass-input rounded-2xl overflow-hidden">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Xabar yozing..."
+                rows={3}
+                className="resize-none !text-xl sm:!text-2xl border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[120px]"
+                disabled={loading}
+              />
+              <Button
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:right-4 sm:left-auto bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] hover:from-purple-500 hover:to-purple-600 dark:hover:from-[#a78bfa] dark:hover:to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(124,58,237,0.2)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 text-sm sm:text-base px-4 sm:px-6 py-4 sm:py-5"
+                size="lg"
+              >
+                {loading ? "Javob yozilmoqda..." : "Yuborish →"}
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={handleSend}
-            disabled={loading || !input.trim()}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] hover:from-purple-500 hover:to-purple-600 dark:hover:from-[#a78bfa] dark:hover:to-[#8b5cf6] text-white shadow-[0_0_10px_rgba(124,58,237,0.15)] dark:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all duration-300"
-          >
-            Yuborish
-          </Button>
         </div>
       </div>
     </div>
