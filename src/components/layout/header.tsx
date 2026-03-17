@@ -5,12 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Hide header on admin pages (admin has its own header)
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <header className="glass sticky top-0 z-50 border-b border-purple-200/30 dark:border-white/5">
