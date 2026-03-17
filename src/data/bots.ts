@@ -14,27 +14,27 @@ Vazifang:
 
 Mavjud ixtisoslashgan ukalar:
 - huquqshunos — Huquqshunos uka (huquq, shartnoma, mehnat, oila)
-- soliq-maslahatchisi — Soliqchi uka (soliq, QQS, deklaratsiya)
+- soliqchi — Soliqchi uka (soliq, QQS, deklaratsiya)
 - shifokor — Shifokor uka (tibbiy maslahat, kasallik, dori)
 - dasturchi — Dasturchi uka (kod, dasturlash, texnologiya)
-- biznes-maslahatchisi — Bizneschi uka (biznes, startup, marketing)
+- bizneschi — Bizneschi uka (biznes, startup, marketing)
 - startupchi — Startupchi uka (startup, g'oya, investitsiya, pitch)
-- talim-mentori — Ustoz uka (ta'lim, DTM, IELTS)
+- ustoz — Ustoz uka (ta'lim, DTM, IELTS)
 - psixolog — Psixolog uka (stress, ruhiy salomatlik)
 - oshpaz — Oshpaz uka (taomlar, retseptlar)
 - tarjimon — Tarjimon uka (tarjima, ingliz, rus tili)
 - rieltor — Rieltor uka (uy-joy, ko'chmas mulk)
 - avtomexanik — Avtomexanik uka (avtomobil ta'mirlash)
-- dehqon-maslahatchisi — Dehqon uka (qishloq xo'jaligi, ekin)
+- dehqon — Dehqon uka (qishloq xo'jaligi, ekin)
 - moliyachi — Moliyachi uka (kredit, jamg'arma, bank)
-- hr-mutaxassisi — HR uka (rezyume, ish qidirish, intervyu)
+- hr — HR uka (rezyume, ish qidirish, intervyu)
 - santexnik — Santexnik uka (suv, quvur, isitish)
 
 [UKA:...] MARKER QOIDALARI — JUDA MUHIM:
 1. BIRINCHI javobda HECH QACHON [UKA:...] qo'yma — hatto mavzu aniq bo'lsa ham.
 2. Foydalanuvchi KAMIDA 2 ta xabar yozgandan keyin, mavzu aniq bo'lsa marker qo'y.
 3. Marker faqat javob OXIRIDA, alohida qatorda bo'lsin.
-4. Format: [UKA:slug:Uka nomi] — masalan: [UKA:santexnik:Santexnik uka] yoki [UKA:soliq-maslahatchisi:Soliqchi uka]
+4. Format: [UKA:slug:Uka nomi] — masalan: [UKA:santexnik:Santexnik uka]
 
 Umumiy qoidalar:
 - O'zbek tilida, oddiy va do'stona tilda gapir
@@ -84,7 +84,7 @@ Qoidalar:
   },
   {
     name: "Soliqchi uka",
-    slug: "soliq-maslahatchisi",
+    slug: "soliqchi",
     description: "Soliq kodeksi, QQS, daromad solig'i, deklaratsiya to'ldirish",
     icon: "🧾",
     category: "Moliya",
@@ -198,7 +198,7 @@ Qoidalar:
   },
   {
     name: "Bizneschi uka",
-    slug: "biznes-maslahatchisi",
+    slug: "bizneschi",
     description: "Biznes rejasi, startup, investitsiya, marketing",
     icon: "📊",
     category: "Biznes",
@@ -237,7 +237,7 @@ Qoidalar:
   },
   {
     name: "Ustoz uka",
-    slug: "talim-mentori",
+    slug: "ustoz",
     description: "O'qish, DTM, IELTS, imtihonlarga tayyorlanish",
     icon: "📚",
     category: "Ta'lim",
@@ -465,7 +465,7 @@ Qoidalar:
   },
   {
     name: "Dehqon uka",
-    slug: "dehqon-maslahatchisi",
+    slug: "dehqon",
     description: "Qishloq xo'jaligi, ekin yetishtirish, chorvachilik",
     icon: "🌾",
     category: "Qishloq xo'jaligi",
@@ -544,7 +544,7 @@ Qoidalar:
   },
   {
     name: "HR uka",
-    slug: "hr-mutaxassisi",
+    slug: "hr",
     description: "Rezyume yozish, ish qidirish, intervyuga tayyorlanish",
     icon: "👔",
     category: "Karera",
