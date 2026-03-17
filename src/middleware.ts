@@ -29,7 +29,13 @@ async function verifyAdminTokenEdge(token: string): Promise<boolean> {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    return hmac === expected;
+    // Timing-safe comparison for edge runtime
+    if (hmac.length !== expected.length) return false;
+    let result = 0;
+    for (let i = 0; i < hmac.length; i++) {
+      result |= hmac.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    return result === 0;
   } catch {
     return false;
   }
@@ -38,16 +44,20 @@ async function verifyAdminTokenEdge(token: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Admin routes
-  if (pathname.startsWith("/admin")) {
-    // Allow login page
-    if (pathname === "/admin/login") {
+  // Admin routes (both pages and API)
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+    // Allow login page and login API
+    if (pathname === "/admin/login" || pathname === "/api/admin/login") {
       return NextResponse.next();
     }
 
     // Check admin cookie
     const adminToken = request.cookies.get("admin-token")?.value;
     if (!adminToken || !(await verifyAdminTokenEdge(adminToken))) {
+      // API routes return 401, pages redirect
+      if (pathname.startsWith("/api/")) {
+        return new NextResponse("Ruxsat yo'q", { status: 401 });
+      }
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
 
@@ -67,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/history/:path*", "/profile/:path*", "/admin/:path*"],
+  matcher: ["/history/:path*", "/profile/:path*", "/admin/:path*", "/api/admin/:path*"],
 };

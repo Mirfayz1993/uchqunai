@@ -4,10 +4,54 @@ import { prisma } from "@/lib/db";
 import { chat, type AIMessage } from "@/lib/ai";
 import { getRagContext } from "@/lib/rag";
 
+// In-memory rate limiter (IP-based)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 20; // max requests per window
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_MESSAGE_LENGTH = 5000; // max 5000 characters
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
+// Cleanup stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now > entry.resetTime) rateLimitMap.delete(ip);
+  }
+}, 5 * 60 * 1000);
+
 export async function POST(req: NextRequest) {
+  // Rate limit check
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
+  if (!checkRateLimit(ip)) {
+    return new Response("Juda ko'p so'rov. Biroz kuting.", { status: 429 });
+  }
+
   const session = await auth();
 
   const { message, botSlug, conversationId, clientMessages } = await req.json();
+
+  // Input validation
+  if (!message || typeof message !== "string" || message.length > MAX_MESSAGE_LENGTH) {
+    return new Response(
+      message?.length > MAX_MESSAGE_LENGTH
+        ? `Xabar juda uzun (max ${MAX_MESSAGE_LENGTH} belgi)`
+        : "Xabar kiritilishi shart",
+      { status: 400 }
+    );
+  }
 
   // Find bot
   const bot = await prisma.bot.findUnique({ where: { slug: botSlug } });

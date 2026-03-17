@@ -26,5 +26,14 @@ export function verifyAdminToken(token: string): boolean {
     .createHmac("sha256", SECRET)
     .update(timestamp)
     .digest("hex");
-  return hmac === expected;
+
+  // Timing-safe comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(hmac, "hex"),
+      Buffer.from(expected, "hex")
+    );
+  } catch {
+    return false;
+  }
 }

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     return new Response(buffer as unknown as BodyInit, {
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(filename)}"`,
+        "Content-Disposition": `attachment; filename="${filename.replace(/[^\x00-\x7F]/g, "_")}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
         "Content-Length": buffer.length.toString(),
       },
     });

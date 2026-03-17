@@ -3,9 +3,16 @@ import { createAdminToken } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF protection: check Origin header
+    const origin = req.headers.get("origin");
+    const host = req.headers.get("host");
+    if (origin && host && !origin.includes(host)) {
+      return NextResponse.json({ error: "CSRF xatosi" }, { status: 403 });
+    }
+
     const { password } = await req.json();
 
-    if (!password || password !== process.env.ADMIN_PASSWORD) {
+    if (!password || typeof password !== "string" || password.length > 128 || password !== process.env.ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: "Parol noto'g'ri" },
         { status: 401 }

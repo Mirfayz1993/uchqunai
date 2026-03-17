@@ -103,10 +103,38 @@ export async function addDocumentWithChunking(
     return 1;
   }
 
-  // Multiple chunks — add each with numbered title
-  for (let i = 0; i < chunks.length; i++) {
-    const chunkTitle = `${title} [${i + 1}/${chunks.length}]`;
-    await addDocument(botId, chunkTitle, chunks[i], sourceUrl);
+  // Multiple chunks — generate all embeddings first, then batch insert
+  const insertedIds: string[] = [];
+  try {
+    for (let i = 0; i < chunks.length; i++) {
+      const chunkTitle = `${title} [${i + 1}/${chunks.length}]`;
+      const embedding = await generateEmbedding(chunks[i]);
+      const result = await prisma.$queryRawUnsafe<{ id: string }[]>(
+        `INSERT INTO documents (id, bot_id, title, content, embedding, source_url, created_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, $4::vector, $5, NOW())
+         RETURNING id`,
+        botId,
+        chunkTitle,
+        chunks[i],
+        `[${embedding.join(",")}]`,
+        sourceUrl || null
+      );
+      if (result[0]?.id) insertedIds.push(result[0].id);
+    }
+  } catch (error) {
+    // Rollback: delete any chunks that were already inserted
+    if (insertedIds.length > 0) {
+      try {
+        const placeholders = insertedIds.map((_, i) => `$${i + 1}`).join(",");
+        await prisma.$executeRawUnsafe(
+          `DELETE FROM documents WHERE id IN (${placeholders})`,
+          ...insertedIds
+        );
+      } catch (cleanupError) {
+        console.error("Chunk cleanup xatosi:", cleanupError);
+      }
+    }
+    throw error;
   }
 
   return chunks.length;

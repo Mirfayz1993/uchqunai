@@ -28,9 +28,23 @@ export async function POST(req: Request) {
       );
     }
 
-    if (password.length < 6) {
+    if (typeof name === "string" && name.length > 100) {
       return NextResponse.json(
-        { error: "Parol kamida 6 belgidan iborat bo'lishi kerak" },
+        { error: "Ism juda uzun (max 100 belgi)" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof phone !== "string" || phone.length > 20) {
+      return NextResponse.json(
+        { error: "Noto'g'ri telefon raqam" },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6 || password.length > 128) {
+      return NextResponse.json(
+        { error: "Parol 6-128 belgi orasida bo'lishi kerak" },
         { status: 400 }
       );
     }

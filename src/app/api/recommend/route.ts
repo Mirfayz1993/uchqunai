@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
 
-    if (!message || typeof message !== "string" || message.trim().length < 2) {
+    if (!message || typeof message !== "string" || message.trim().length < 2 || message.length > 2000) {
       return NextResponse.json(
-        { error: "Savol juda qisqa" },
+        { error: message?.length > 2000 ? "Savol juda uzun (max 2000 belgi)" : "Savol juda qisqa" },
         { status: 400 }
       );
     }

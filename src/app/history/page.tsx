@@ -12,6 +12,7 @@ export default async function HistoryPage() {
     where: { userId: session.user.id },
     include: { bot: true, messages: { take: 1, orderBy: { createdAt: "desc" } } },
     orderBy: { updatedAt: "desc" },
+    take: 50,
   });
 
   return (

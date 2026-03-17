@@ -41,6 +41,7 @@ export function SmartInput() {
 
       if (!data.found || data.slug === "umumiy") {
         const encodedMessage = encodeURIComponent(message);
+        setLoading(false);
         router.push(`/chat/umumiy?q=${encodedMessage}`);
         return;
       }
@@ -48,6 +49,7 @@ export function SmartInput() {
       setRecommendation(data);
     } catch {
       const encodedMessage = encodeURIComponent(message);
+      setLoading(false);
       router.push(`/chat/umumiy?q=${encodedMessage}`);
       return;
     }
