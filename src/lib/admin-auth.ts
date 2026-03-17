@@ -3,6 +3,7 @@ import crypto from "crypto";
 const SECRET = process.env.AUTH_SECRET || "fallback-secret";
 const TOKEN_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
+// Node.js crypto for API routes (server-side)
 export function createAdminToken(): string {
   const timestamp = Date.now().toString();
   const hmac = crypto
