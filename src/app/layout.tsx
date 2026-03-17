@@ -21,7 +21,10 @@ export const metadata: Metadata = {
   description:
     "O'zbekiston sharoitiga ixtisoslashgan sun'iy intellekt yordamchilari. Huquq, soliq, tibbiyot, dasturlash va boshqa sohalarda maslahat oling.",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
     apple: "/favicon.png",
   },
 };
