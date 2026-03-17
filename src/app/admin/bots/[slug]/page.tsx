@@ -41,6 +41,7 @@ export default function BotKnowledgePage({
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -87,9 +88,15 @@ export default function BotKnowledgePage({
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error("Failed to add document");
+      const result = await res.json();
       setShowAddForm(false);
+      setSuccessMessage(
+        result.chunks > 1
+          ? `✅ Hujjat ${result.chunks} ta bo'lakka bo'linib qo'shildi`
+          : "✅ Hujjat muvaffaqiyatli qo'shildi"
+      );
+      setTimeout(() => setSuccessMessage(""), 5000);
       await fetchDocuments(bot.id, page);
-      // Refresh bot to update count
       await fetchBot();
     } catch {
       setError("Hujjat qo'shishda xatolik");
@@ -197,6 +204,13 @@ export default function BotKnowledgePage({
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200/50 dark:border-green-500/20">
+          <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
         </div>
       )}
 

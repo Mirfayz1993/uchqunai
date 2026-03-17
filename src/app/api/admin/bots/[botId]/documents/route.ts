@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
-import { addDocument } from "@/lib/rag";
+import { addDocumentWithChunking } from "@/lib/rag";
 
 export async function GET(
   req: NextRequest,
@@ -87,9 +87,9 @@ export async function POST(
       );
     }
 
-    await addDocument(botId, title.trim(), content.trim(), sourceUrl?.trim() || undefined);
+    const chunks = await addDocumentWithChunking(botId, title.trim(), content.trim(), sourceUrl?.trim() || undefined);
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    return NextResponse.json({ success: true, chunks }, { status: 201 });
   } catch (error) {
     console.error("Documents POST error:", error);
     return NextResponse.json(
