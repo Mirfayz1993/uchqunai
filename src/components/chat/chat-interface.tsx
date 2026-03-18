@@ -216,8 +216,17 @@ export function ChatInterface({
           <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-[#f0e6ff]">{botName}</h2>
           <p className="text-xs text-gray-400 dark:text-[#a78bfa]/50">AI uka • Uchqun.ai</p>
         </div>
-        {botSlug === "umumiy" && session && (
-          <PushSubscribe />
+        {botSlug === "umumiy" && (
+          session
+            ? <PushSubscribe />
+            : <a
+                href="/login?callbackUrl=/chat/umumiy"
+                className="flex items-center gap-1 text-xs text-purple-600 dark:text-[#a78bfa] hover:text-purple-800 dark:hover:text-[#c4b5fd] transition-colors px-2 py-1 rounded-lg hover:bg-purple-50 dark:hover:bg-[#8b5cf6]/10"
+                title="Eslatmalar uchun kiring"
+              >
+                <span>🔔</span>
+                <span className="hidden sm:inline">Eslatmalar</span>
+              </a>
         )}
       </div>
 
