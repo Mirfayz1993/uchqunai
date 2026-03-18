@@ -1,4 +1,27 @@
 import crypto from "crypto";
+import type { NextRequest } from "next/server";
+
+// ─── Auth Helper (for API routes) ─────────────────────────────────────────
+
+export type AdminAuthResult =
+  | { type: "admin" }
+  | { type: "bot-admin"; botSlug: string }
+  | null;
+
+export function getAdminAuth(req: NextRequest): AdminAuthResult {
+  const adminToken = req.cookies.get("admin-token")?.value;
+  if (adminToken && verifyAdminToken(adminToken)) {
+    return { type: "admin" };
+  }
+  const botAdminToken = req.cookies.get("bot-admin-token")?.value;
+  if (botAdminToken) {
+    const result = verifyBotAdminToken(botAdminToken);
+    if (result.valid && result.botSlug) {
+      return { type: "bot-admin", botSlug: result.botSlug };
+    }
+  }
+  return null;
+}
 
 const SECRET = process.env.AUTH_SECRET || "fallback-secret";
 const TOKEN_TTL = 24 * 60 * 60 * 1000; // 24 hours

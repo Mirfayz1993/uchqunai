@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAdminToken } from "@/lib/admin-auth";
+import { getAdminAuth } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
-  const adminToken = req.cookies.get("admin-token")?.value;
-  if (!adminToken || !verifyAdminToken(adminToken)) {
+  const auth = getAdminAuth(req);
+  if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const bots = await prisma.bot.findMany({
+      where: auth.type === "bot-admin" ? { slug: auth.botSlug } : undefined,
       include: {
         _count: { select: { documents: true } },
       },
@@ -29,9 +30,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     console.error("Bots API error:", error);
-    return NextResponse.json(
-      { error: "Server xatosi" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Server xatosi" }, { status: 500 });
   }
 }
