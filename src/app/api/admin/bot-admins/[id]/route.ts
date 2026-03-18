@@ -1,0 +1,32 @@
+import { NextRequest, NextResponse } from "next/server";
+import { hashPassword } from "@/lib/admin-auth";
+import { prisma } from "@/lib/db";
+
+// PUT: update password
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const { password } = await req.json();
+
+    if (!password || password.length < 4 || password.length > 128) {
+      return NextResponse.json({ error: "Parol 4-128 belgi bo'lishi kerak" }, { status: 400 });
+    }
+
+    const passwordHash = hashPassword(password);
+    await prisma.botAdmin.update({ where: { id }, data: { passwordHash } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Server xatosi" }, { status: 500 });
+  }
+}
+
+// DELETE: remove bot admin
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    await prisma.botAdmin.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Server xatosi" }, { status: 500 });
+  }
+}

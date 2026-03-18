@@ -75,3 +75,22 @@ model Document {
 
   @@map("documents")
 }
+
+model BotAdmin {
+  id           String   @id @default(cuid())
+  botSlug      String   @unique @map("bot_slug")
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("bot_admins")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}

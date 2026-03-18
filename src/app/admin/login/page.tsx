@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
 export default function AdminLoginPage() {
@@ -16,22 +17,30 @@ export default function AdminLoginPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
+    const username = (formData.get("username") as string).trim();
     const password = formData.get("password") as string;
 
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (!res.ok) {
-        setError("Parol noto'g'ri");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Login yoki parol noto'g'ri");
         setLoading(false);
         return;
       }
 
-      router.push("/admin");
+      const data = await res.json();
+      // Bot admin — redirect to their bot page
+      if (data.botSlug) {
+        router.push(`/admin/bots/${data.botSlug}`);
+      } else {
+        router.push("/admin");
+      }
       router.refresh();
     } catch {
       setError("Server xatosi");
@@ -61,9 +70,16 @@ export default function AdminLoginPage() {
               <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
             </div>
           )}
+          <Input
+            name="username"
+            placeholder="Foydalanuvchi nomi"
+            autoComplete="username"
+            className="glass-input border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
+            required
+          />
           <PasswordInput
             name="password"
-            placeholder="Admin parol"
+            placeholder="Parol"
             className="glass-input border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/30 focus:border-purple-400 dark:focus:border-[#8b5cf6]/50 transition-colors"
             required
           />

@@ -14,7 +14,6 @@ async function verifyAdminTokenEdge(token: string): Promise<boolean> {
     const age = Date.now() - parseInt(timestamp);
     if (isNaN(age) || age > TOKEN_TTL || age < 0) return false;
 
-    // Use Web Crypto API (edge-compatible)
     const secret = process.env.AUTH_SECRET || "fallback-secret";
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
@@ -29,7 +28,6 @@ async function verifyAdminTokenEdge(token: string): Promise<boolean> {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    // Timing-safe comparison for edge runtime
     if (hmac.length !== expected.length) return false;
     let result = 0;
     for (let i = 0; i < hmac.length; i++) {
@@ -38,6 +36,48 @@ async function verifyAdminTokenEdge(token: string): Promise<boolean> {
     return result === 0;
   } catch {
     return false;
+  }
+}
+
+// Bot admin token: {botSlug}:{timestamp}:{hmac}
+// HMAC covers: {botSlug}:{timestamp}
+async function verifyBotAdminTokenEdge(token: string): Promise<string | null> {
+  try {
+    const parts = token.split(":");
+    if (parts.length < 3) return null;
+
+    const hmac = parts[parts.length - 1];
+    const timestamp = parts[parts.length - 2];
+    const botSlug = parts.slice(0, parts.length - 2).join(":");
+
+    if (!botSlug || !timestamp || !hmac) return null;
+
+    const age = Date.now() - parseInt(timestamp);
+    if (isNaN(age) || age > TOKEN_TTL || age < 0) return null;
+
+    const secret = process.env.AUTH_SECRET || "fallback-secret";
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    const payload = `${botSlug}:${timestamp}`;
+    const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
+    const expected = Array.from(new Uint8Array(signature))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    if (hmac.length !== expected.length) return null;
+    let result = 0;
+    for (let i = 0; i < hmac.length; i++) {
+      result |= hmac.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    return result === 0 ? botSlug : null;
+  } catch {
+    return null;
   }
 }
 
@@ -51,17 +91,42 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Check admin cookie
+    // Check main admin cookie
     const adminToken = request.cookies.get("admin-token")?.value;
-    if (!adminToken || !(await verifyAdminTokenEdge(adminToken))) {
-      // API routes return 401, pages redirect
-      if (pathname.startsWith("/api/")) {
-        return new NextResponse("Ruxsat yo'q", { status: 401 });
-      }
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+    if (adminToken && (await verifyAdminTokenEdge(adminToken))) {
+      return NextResponse.next();
     }
 
-    return NextResponse.next();
+    // Check bot admin cookie
+    const botAdminToken = request.cookies.get("bot-admin-token")?.value;
+    if (botAdminToken) {
+      const botSlug = await verifyBotAdminTokenEdge(botAdminToken);
+      if (botSlug) {
+        // Bot admin can only access their own bot page
+        const allowedPage = `/admin/bots/${botSlug}`;
+        const allowedApi = `/api/admin/bots/`;
+
+        if (
+          pathname === allowedPage ||
+          pathname.startsWith(`${allowedPage}/`) ||
+          pathname.startsWith(allowedApi)
+        ) {
+          return NextResponse.next();
+        }
+
+        // Redirect bot admin to their page
+        if (!pathname.startsWith("/api/")) {
+          return NextResponse.redirect(new URL(allowedPage, request.url));
+        }
+        return new NextResponse("Ruxsat yo'q", { status: 403 });
+      }
+    }
+
+    // Not authenticated
+    if (pathname.startsWith("/api/")) {
+      return new NextResponse("Ruxsat yo'q", { status: 401 });
+    }
+    return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
   // User auth routes

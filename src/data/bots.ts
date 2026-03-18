@@ -15,7 +15,7 @@ Vazifang:
 
 Mavjud ixtisoslashgan ukalar:
 - huquqshunos — Huquqshunos uka (huquq, shartnoma, mehnat, oila)
-- soliqchi — Soliqchi uka (soliq, QQS, deklaratsiya)
+- bugalter — Bugalter uka (soliq, QQS, deklaratsiya)
 - dasturchi — Dasturchi uka (kod, dasturlash, texnologiya)
 - biznesmen — Biznesmen uka (biznes, startup, marketing)
 - startupchi — Startupchi uka (startup, g'oya, investitsiya, pitch)
@@ -80,11 +80,11 @@ Qoidalar:
 `,
   },
   {
-    name: "Soliqchi uka",
-    slug: "soliqchi",
+    name: "Bugalter uka",
+    slug: "bugalter",
     description: "Soliq kodeksi, QQS, daromad solig'i, deklaratsiya to'ldirish",
     icon: "🧾",
-    image: "/bots/soliqchi.png",
+    image: "/bots/bugalter.png",
     category: "Moliya",
     systemPrompt: `Sen O'zbekiston soliq tizimini chuqur biladigan professional soliq maslahatchisisan.
 

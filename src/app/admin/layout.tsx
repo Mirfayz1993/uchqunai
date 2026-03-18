@@ -26,6 +26,7 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: "📊" },
+    { href: "/admin/settings", label: "Sozlamalar", icon: "⚙️" },
   ];
 
   return (

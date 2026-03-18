@@ -3,7 +3,8 @@ import crypto from "crypto";
 const SECRET = process.env.AUTH_SECRET || "fallback-secret";
 const TOKEN_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-// Node.js crypto for API routes (server-side)
+// ─── Main Admin Token ──────────────────────────────────────────────────────
+
 export function createAdminToken(): string {
   const timestamp = Date.now().toString();
   const hmac = crypto
@@ -27,10 +28,72 @@ export function verifyAdminToken(token: string): boolean {
     .update(timestamp)
     .digest("hex");
 
-  // Timing-safe comparison to prevent timing attacks
   try {
     return crypto.timingSafeEqual(
       Buffer.from(hmac, "hex"),
+      Buffer.from(expected, "hex")
+    );
+  } catch {
+    return false;
+  }
+}
+
+// ─── Bot Admin Token ───────────────────────────────────────────────────────
+// Format: {botSlug}:{timestamp}:{hmac}
+// HMAC covers: {botSlug}:{timestamp}
+
+export function createBotAdminToken(botSlug: string): string {
+  const timestamp = Date.now().toString();
+  const payload = `${botSlug}:${timestamp}`;
+  const hmac = crypto
+    .createHmac("sha256", SECRET)
+    .update(payload)
+    .digest("hex");
+  return `${botSlug}:${timestamp}:${hmac}`;
+}
+
+export function verifyBotAdminToken(token: string): { valid: boolean; botSlug?: string } {
+  const parts = token.split(":");
+  if (parts.length < 3) return { valid: false };
+
+  // botSlug may contain "-" so rejoin all parts except last two
+  const hmac = parts[parts.length - 1];
+  const timestamp = parts[parts.length - 2];
+  const botSlug = parts.slice(0, parts.length - 2).join(":");
+
+  if (!botSlug || !timestamp || !hmac) return { valid: false };
+
+  const age = Date.now() - parseInt(timestamp);
+  if (isNaN(age) || age > TOKEN_TTL || age < 0) return { valid: false };
+
+  const payload = `${botSlug}:${timestamp}`;
+  const expected = crypto
+    .createHmac("sha256", SECRET)
+    .update(payload)
+    .digest("hex");
+
+  try {
+    const valid = crypto.timingSafeEqual(
+      Buffer.from(hmac, "hex"),
+      Buffer.from(expected, "hex")
+    );
+    return valid ? { valid: true, botSlug } : { valid: false };
+  } catch {
+    return { valid: false };
+  }
+}
+
+// ─── Password Hashing ─────────────────────────────────────────────────────
+
+export function hashPassword(password: string): string {
+  return crypto.createHmac("sha256", SECRET).update(password).digest("hex");
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  const expected = hashPassword(password);
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(hash, "hex"),
       Buffer.from(expected, "hex")
     );
   } catch {
