@@ -63,6 +63,7 @@ Misol:
         slug: bot.slug,
         name: bot.name,
         icon: bot.icon,
+        image: bot.image,
         description: bot.description,
         category: bot.category,
       });
