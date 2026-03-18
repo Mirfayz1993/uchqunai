@@ -20,12 +20,23 @@ export const metadata: Metadata = {
   title: "Uchqun.ai — O'zbekiston uchun AI Assistent",
   description:
     "O'zbekiston sharoitiga ixtisoslashgan sun'iy intellekt yordamchilari. Huquq, soliq, tibbiyot, dasturlash va boshqa sohalarda maslahat oling.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Uchqun.ai",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon.png", type: "image/png" },
     ],
     apple: "/favicon.png",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#8b5cf6",
+    "msapplication-tap-highlight": "no",
   },
 };
 
