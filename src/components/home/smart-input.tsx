@@ -115,7 +115,7 @@ export function SmartInput() {
               <span className="text-amber-500 dark:text-[#fbbf24]">⚡</span> Savolingizni yozing — biz eng mos ukani topamiz
             </p>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-[#8b5cf6]/10 border border-purple-200/30 dark:border-[#8b5cf6]/20">
-              <span className="text-sm">💬</span>
+              <img src="/bots/umumiy.png" alt="Umumiy" className="w-4 h-4 rounded-sm object-cover" />
               <span className="text-xs font-medium text-purple-600 dark:text-[#a78bfa]">Umumiy yordamchi</span>
             </div>
           </div>
