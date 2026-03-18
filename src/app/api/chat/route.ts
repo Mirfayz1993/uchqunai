@@ -4,6 +4,39 @@ import { prisma } from "@/lib/db";
 import { chat, type AIMessage } from "@/lib/ai";
 import { getRagContext } from "@/lib/rag";
 
+const TYPE_NAMES: Record<string, string> = {
+  wake_up: "Uyg'onish",
+  meeting: "Uchrashuv",
+  birthday: "Tug'ilgan kun",
+  task: "Vazifa",
+  general: "Eslatma",
+};
+
+async function getTodayRemindersContext(userId: string): Promise<string> {
+  try {
+    const now = new Date();
+    const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(now); endOfDay.setHours(23, 59, 59, 999);
+
+    const reminders = await prisma.reminder.findMany({
+      where: { userId, remindAt: { gte: startOfDay, lte: endOfDay } },
+      orderBy: { remindAt: "asc" },
+    });
+
+    if (reminders.length === 0) return "";
+
+    const lines = reminders.map((r) => {
+      const time = r.remindAt.toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" });
+      const typeName = TYPE_NAMES[r.type] || "Eslatma";
+      return `- ${time}: [${typeName}] ${r.title}`;
+    });
+
+    return `\n\n📅 FOYDALANUVCHINING BUGUNGI KUN TARTIBI:\n${lines.join("\n")}\nSuhbat boshida yoki so'ralganda bugungi kun tartibini eslatib o'ting.`;
+  } catch {
+    return "";
+  }
+}
+
 // In-memory rate limiter (IP-based)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_MAX = 20; // max requests per window
@@ -116,7 +149,27 @@ export async function POST(req: NextRequest) {
   const lastUserMessage = messages.filter((m) => m.role === "user").pop()?.content || "";
   const isDetailedMessage = lastUserMessage.split(/\s+/).length >= 15;
 
-  let systemPrompt = bot.systemPrompt + `\n\n📏 JAVOB UZUNLIGI QOIDASI: Javobingni QISQA va ANIQ qil. Maksimal 150-200 so'z. Ro'yxat bo'lsa maksimal 4-5 ta band. Foydalanuvchi ko'proq so'rasa — keyin qo'sha olasan.`;
+  // Umumiy bot: bugungi eslatmalarni inject qilish
+  let todayReminders = "";
+  if (isUmumiy && !isGuest) {
+    todayReminders = await getTodayRemindersContext(session!.user!.id as string);
+  }
+
+  let systemPrompt = bot.systemPrompt + `\n\n📏 JAVOB UZUNLIGI QOIDASI: Javobingni QISQA va ANIQ qil. Maksimal 150-200 so'z. Ro'yxat bo'lsa maksimal 4-5 ta band. Foydalanuvchi ko'proq so'rasa — keyin qo'sha olasan.` + todayReminders;
+
+  if (isUmumiy && !isGuest) {
+    systemPrompt += `
+
+🔔 ESLATMA SAQLASH QOIDASI:
+Foydalanuvchi eslatma qo'shmoqchi bo'lsa (uyg'onish vaqti, uchrashuv, tug'ilgan kun, vazifa va h.k.), javobingni oxiriga quyidagi formatda qo'sh:
+
+[ESLATMA:{"title":"sarlavha","type":"wake_up|meeting|birthday|task|general","remindAt":"YYYY-MM-DDTHH:MM:00","isRecurring":false,"recurType":null}]
+
+Misol: "Ertaga soat 9 da uyg'onish" → type: "wake_up", isRecurring: true, recurType: "daily"
+Misol: "Juma kuni Jasur bilan uchrashuv" → type: "meeting", isRecurring: false
+Misol: "Har kuni soat 7 da sport" → isRecurring: true, recurType: "daily"
+Tarix noaniq bo'lsa, bugundan eng yaqin vaqtni tanlang. Faqat foydalanuvchi eslatma so'raganda qo'shing.`;
+  }
 
   if (!isUmumiy && userMessageCount <= 2 && !isDetailedMessage) {
     systemPrompt += `\n\n⚠️ ANIQLASHTIRISH BOSQICHI (${userMessageCount}-xabar):
@@ -145,6 +198,31 @@ QOIDA: Foydalanuvchi hali yetarli ma'lumot bermagan. Sen FAQAT 1-2 ta eng muhim 
           });
         } catch (saveError) {
           console.error("Javob saqlash xatosi:", saveError);
+        }
+
+        // Eslatma saqlash: [ESLATMA:{...}] ni topish
+        if (isUmumiy) {
+          const match = fullResponse.match(/\[ESLATMA:(\{[^}]+\})\]/);
+          if (match) {
+            try {
+              const data = JSON.parse(match[1]);
+              if (data.title && data.type && data.remindAt) {
+                await prisma.reminder.create({
+                  data: {
+                    userId: session!.user!.id as string,
+                    title: data.title,
+                    type: data.type,
+                    remindAt: new Date(data.remindAt),
+                    isRecurring: Boolean(data.isRecurring),
+                    recurType: data.recurType || null,
+                    notified: false,
+                  },
+                });
+              }
+            } catch (parseErr) {
+              console.error("Eslatma saqlash xatosi:", parseErr);
+            }
+          }
         }
       }
     },

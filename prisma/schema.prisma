@@ -10,14 +10,16 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  name          String?
-  phone         String         @unique
-  passwordHash  String         @map("password_hash")
-  image         String?
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  conversations Conversation[]
+  id                String             @id @default(cuid())
+  name              String?
+  phone             String             @unique
+  passwordHash      String             @map("password_hash")
+  image             String?
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  conversations     Conversation[]
+  reminders         Reminder[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -93,4 +95,31 @@ model SiteSetting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  title       String
+  type        String   // wake_up | meeting | birthday | task | general
+  remindAt    DateTime @map("remind_at")
+  isRecurring Boolean  @default(false) @map("is_recurring")
+  recurType   String?  @map("recur_type") // daily | weekly | yearly
+  notified    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reminders")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("push_subscriptions")
 }

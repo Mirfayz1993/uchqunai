@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MarkdownMessage } from "./markdown-message";
 import { VideoSuggestions } from "./video-suggestions";
 import { DocumentDownload } from "./document-download";
+import { PushSubscribe } from "@/components/push-subscribe";
 
 type UkaSuggestion = { slug: string; name: string } | null;
 
@@ -16,6 +17,22 @@ function extractUkaSuggestion(content: string): UkaSuggestion {
   const match = content.match(/\[UKA:([a-z0-9-]+):([^\]]+)\]/);
   if (!match) return null;
   return { slug: match[1], name: match[2] };
+}
+
+function cleanContent(content: string): string {
+  // [ESLATMA:{...}] tagini yashirish
+  return content.replace(/\[ESLATMA:\{[^}]*\}\]/g, "").trim();
+}
+
+function extractSavedReminder(content: string): string | null {
+  const match = content.match(/\[ESLATMA:(\{[^}]+\})\]/);
+  if (!match) return null;
+  try {
+    const data = JSON.parse(match[1]);
+    return data.title || null;
+  } catch {
+    return null;
+  }
 }
 
 
@@ -195,10 +212,13 @@ export function ChatInterface({
         ) : (
           <span className="text-xl sm:text-2xl float-3d-delayed">{botIcon}</span>
         )}
-        <div>
+        <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-[#f0e6ff]">{botName}</h2>
           <p className="text-xs text-gray-400 dark:text-[#a78bfa]/50">AI uka • Uchqun.ai</p>
         </div>
+        {botSlug === "umumiy" && session && (
+          <PushSubscribe />
+        )}
       </div>
 
       {/* Messages */}
@@ -216,38 +236,50 @@ export function ChatInterface({
           </div>
         )}
         <div className="max-w-3xl mx-auto space-y-4">
-          {messages.map((msg, i) => (
-            <div key={i}>
-              <div
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
+          {messages.map((msg, i) => {
+            const displayContent = msg.role === "assistant" ? cleanContent(msg.content) : msg.content;
+            const savedReminder = msg.role === "assistant" ? extractSavedReminder(msg.content) : null;
+            return (
+              <div key={i}>
                 <div
-                  className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] text-white shadow-[0_0_10px_rgba(124,58,237,0.15)] dark:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
-                      : "glass border border-purple-100/50 dark:border-[#8b5cf6]/10 text-gray-900 dark:text-[#f0e6ff]"
-                  }`}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <MarkdownMessage content={msg.content} role={msg.role} />
+                  <div
+                    className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 ${
+                      msg.role === "user"
+                        ? "bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] text-white shadow-[0_0_10px_rgba(124,58,237,0.15)] dark:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+                        : "glass border border-purple-100/50 dark:border-[#8b5cf6]/10 text-gray-900 dark:text-[#f0e6ff]"
+                    }`}
+                  >
+                    <MarkdownMessage content={displayContent} role={msg.role} />
+                  </div>
                 </div>
+                {savedReminder && (
+                  <div className="flex justify-start mt-1">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200/50 dark:border-green-500/20 text-xs text-green-700 dark:text-green-400">
+                      <span>✅</span>
+                      <span>Eslatma saqlandi: <strong>{savedReminder}</strong></span>
+                    </div>
+                  </div>
+                )}
+                {msg.role === "assistant" && displayContent && !loading && (
+                  <AssistantExtras
+                    content={msg.content}
+                    botSlug={botSlug}
+                    messages={messages}
+                    onNavigate={(slug, q) => {
+                      const chatUrl = `/chat/${slug}?q=${encodeURIComponent(q)}`;
+                      if (session) {
+                        router.push(chatUrl);
+                      } else {
+                        router.push(`/login?callbackUrl=${encodeURIComponent(chatUrl)}`);
+                      }
+                    }}
+                  />
+                )}
               </div>
-              {msg.role === "assistant" && msg.content && !loading && (
-                <AssistantExtras
-                  content={msg.content}
-                  botSlug={botSlug}
-                  messages={messages}
-                  onNavigate={(slug, q) => {
-                    const chatUrl = `/chat/${slug}?q=${encodeURIComponent(q)}`;
-                    if (session) {
-                      router.push(chatUrl);
-                    } else {
-                      router.push(`/login?callbackUrl=${encodeURIComponent(chatUrl)}`);
-                    }
-                  }}
-                />
-              )}
-            </div>
-          ))}
+            );
+          })}
           {loading && messages[messages.length - 1]?.role !== "assistant" && (
             <div className="flex justify-start">
               <div className="glass rounded-2xl px-3 sm:px-4 py-2 border border-purple-100/50 dark:border-[#8b5cf6]/10">
