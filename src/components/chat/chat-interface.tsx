@@ -64,6 +64,7 @@ type ChatInterfaceProps = {
   botSlug: string;
   botName: string;
   botIcon: string;
+  botImage?: string;
   initialMessage?: string;
   conversationId?: string;
 };
@@ -72,6 +73,7 @@ export function ChatInterface({
   botSlug,
   botName,
   botIcon,
+  botImage,
   initialMessage,
   conversationId: initialConversationId,
 }: ChatInterfaceProps) {
@@ -188,7 +190,11 @@ export function ChatInterface({
     <div className="flex flex-col h-full">
       {/* Chat header */}
       <div className="glass border-b border-purple-200/20 dark:border-[#8b5cf6]/10 px-3 sm:px-4 py-3 flex items-center gap-3">
-        <span className="text-xl sm:text-2xl float-3d-delayed">{botIcon}</span>
+        {botImage ? (
+          <img src={botImage} alt={botName} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover float-3d-delayed" />
+        ) : (
+          <span className="text-xl sm:text-2xl float-3d-delayed">{botIcon}</span>
+        )}
         <div>
           <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-[#f0e6ff]">{botName}</h2>
           <p className="text-xs text-gray-400 dark:text-[#a78bfa]/50">AI uka • Uchqun.ai</p>
@@ -200,7 +206,11 @@ export function ChatInterface({
         {messages.length === 0 && !loading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-3">
-              <span className="text-4xl sm:text-5xl block float-3d">{botIcon}</span>
+              {botImage ? (
+                <img src={botImage} alt={botName} className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover float-3d" />
+              ) : (
+                <span className="text-4xl sm:text-5xl block float-3d">{botIcon}</span>
+              )}
               <p className="text-gray-400 dark:text-[#a78bfa]/40">Savolingizni yozing...</p>
             </div>
           </div>

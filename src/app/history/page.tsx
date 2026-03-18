@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { initialBots } from "@/data/bots";
 
 export default async function HistoryPage() {
   const session = await auth();
@@ -33,7 +34,14 @@ export default async function HistoryPage() {
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <span>{conv.bot.icon}</span>
+                    {(() => {
+                      const botData = initialBots.find(b => b.slug === conv.bot.slug);
+                      return botData?.image ? (
+                        <img src={botData.image} alt={conv.bot.name} className="w-6 h-6 rounded-md object-cover" />
+                      ) : (
+                        <span>{conv.bot.icon}</span>
+                      );
+                    })()}
                     {conv.bot.name}
                   </CardTitle>
                   <CardDescription className="line-clamp-2">

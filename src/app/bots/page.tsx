@@ -36,9 +36,13 @@ export default function BotsPage() {
                     style={{ animationDelay: `${(catIdx * 0.1) + (i * 0.05)}s` }}
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform duration-300">
-                        {bot.icon}
-                      </span>
+                      {bot.image ? (
+                        <img src={bot.image} alt={bot.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover group-hover:scale-110 transition-transform duration-300" />
+                      ) : (
+                        <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform duration-300">
+                          {bot.icon}
+                        </span>
+                      )}
                       <span className="font-semibold text-base sm:text-lg text-gray-900 dark:text-[#f0e6ff] group-hover:text-amber-600 dark:group-hover:text-[#fbbf24] transition-colors duration-300">
                         {bot.name}
                       </span>

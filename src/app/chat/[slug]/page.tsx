@@ -39,6 +39,7 @@ export default async function ChatPage({ params, searchParams }: Props) {
           botSlug={bot.slug}
           botName={bot.name}
           botIcon={bot.icon}
+          botImage={bot.image}
           currentConversationId={conversation}
         />
       )}
@@ -48,6 +49,7 @@ export default async function ChatPage({ params, searchParams }: Props) {
           botSlug={bot.slug}
           botName={bot.name}
           botIcon={bot.icon}
+          botImage={bot.image}
           initialMessage={q}
           conversationId={conversation}
         />

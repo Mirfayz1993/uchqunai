@@ -88,9 +88,13 @@ export default function HomePage() {
                 className={`glass-card rounded-2xl p-5 sm:p-6 cursor-pointer h-full group shine fade-in-up stagger-${Math.min(i + 1, 8)}`}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl sm:text-3xl float-3d-delayed group-hover:scale-110 transition-transform duration-300">
-                    {bot.icon}
-                  </span>
+                  {bot.image ? (
+                    <img src={bot.image} alt={bot.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover float-3d-delayed group-hover:scale-110 transition-transform duration-300" />
+                  ) : (
+                    <span className="text-2xl sm:text-3xl float-3d-delayed group-hover:scale-110 transition-transform duration-300">
+                      {bot.icon}
+                    </span>
+                  )}
                   <span className="font-semibold text-base sm:text-lg text-gray-900 dark:text-[#f0e6ff] group-hover:text-amber-600 dark:group-hover:text-[#fbbf24] transition-colors duration-300">
                     {bot.name}
                   </span>

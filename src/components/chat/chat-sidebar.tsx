@@ -17,11 +17,13 @@ export function ChatSidebar({
   botSlug,
   botName,
   botIcon,
+  botImage,
   currentConversationId,
 }: {
   botSlug: string;
   botName: string;
   botIcon: string;
+  botImage?: string;
   currentConversationId?: string | null;
 }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -52,7 +54,11 @@ export function ChatSidebar({
       {/* Sidebar header */}
       <div className="p-3 border-b border-purple-200/20 dark:border-[#8b5cf6]/10 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-lg">{botIcon}</span>
+          {botImage ? (
+            <img src={botImage} alt={botName} className="w-6 h-6 rounded-md object-cover" />
+          ) : (
+            <span className="text-lg">{botIcon}</span>
+          )}
           <span className="font-semibold text-sm text-gray-900 dark:text-[#f0e6ff] truncate">{botName}</span>
         </div>
         <Button

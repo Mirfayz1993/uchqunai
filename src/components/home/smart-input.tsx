@@ -129,7 +129,11 @@ export function SmartInput() {
             </div>
             <p className="text-sm text-gray-500 dark:text-[#a78bfa]/60">Sizga eng mos uka:</p>
             <div className="flex items-center justify-center gap-3 sm:gap-4">
-              <span className="text-4xl sm:text-5xl float-3d">{recommendation.icon}</span>
+              {recommendation.image ? (
+                <img src={recommendation.image} alt={recommendation.name} className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover float-3d" />
+              ) : (
+                <span className="text-4xl sm:text-5xl float-3d">{recommendation.icon}</span>
+              )}
               <div className="text-left">
                 <h3 className="font-bold text-lg sm:text-xl gradient-text-gold">{recommendation.name}</h3>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-[#a78bfa]/60">{recommendation.description}</p>
@@ -141,7 +145,7 @@ export function SmartInput() {
                 size="lg"
                 className="bg-gradient-to-r from-purple-600 to-amber-500 dark:from-[#8b5cf6] dark:to-[#fbbf24] hover:from-purple-500 hover:to-amber-400 dark:hover:from-[#a78bfa] dark:hover:to-[#f59e0b] text-white shadow-[0_0_15px_rgba(124,58,237,0.2)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 text-sm sm:text-base px-5 sm:px-6 py-4 sm:py-5"
               >
-                {recommendation.icon} {recommendation.name} bilan davom etish
+                {recommendation.name} bilan davom etish
               </Button>
               <Button
                 variant="outline"
