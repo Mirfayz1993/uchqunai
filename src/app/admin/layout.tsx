@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+
+type AdminMe = { type: "admin" } | { type: "bot-admin"; botSlug: string };
 
 export default function AdminLayout({
   children,
@@ -12,6 +15,15 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [me, setMe] = useState<AdminMe | null>(null);
+
+  useEffect(() => {
+    if (pathname === "/admin/login") return;
+    fetch("/api/admin/me")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setMe(data); })
+      .catch(() => {});
+  }, [pathname]);
 
   // Don't show admin layout on login page
   if (pathname === "/admin/login") {
@@ -24,10 +36,15 @@ export default function AdminLayout({
     router.refresh();
   }
 
-  const navItems = [
-    { href: "/admin", label: "Dashboard", icon: "📊" },
-    { href: "/admin/settings", label: "Sozlamalar", icon: "⚙️" },
-  ];
+  const isBotAdmin = me?.type === "bot-admin";
+  const botSlug = me?.type === "bot-admin" ? me.botSlug : null;
+
+  const navItems = isBotAdmin
+    ? [] // bot-admin has no extra nav — they're already on their page
+    : [
+        { href: "/admin", label: "Dashboard", icon: "📊" },
+        { href: "/admin/settings", label: "Sozlamalar", icon: "⚙️" },
+      ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -35,9 +52,11 @@ export default function AdminLayout({
       <header className="glass sticky top-0 z-50 border-b border-purple-200/30 dark:border-white/5">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="flex items-center gap-2 group">
+            <Link href={botSlug ? `/admin/bots/${botSlug}` : "/admin"} className="flex items-center gap-2 group">
               <span className="text-xl">🔐</span>
-              <span className="text-lg font-bold gradient-text">Admin</span>
+              <span className="text-lg font-bold gradient-text">
+                {botSlug ? `${botSlug} admin` : "Admin"}
+              </span>
             </Link>
             <nav className="flex items-center gap-1">
               {navItems.map((item) => (

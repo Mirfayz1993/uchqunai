@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hashPassword } from "@/lib/admin-auth";
+import { getAdminAuth, hashPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 
-// PUT: update password
+// PUT: update password (main admin only)
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = getAdminAuth(req);
+  if (!auth || auth.type !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { id } = await params;
     const { password } = await req.json();
@@ -20,8 +24,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-// DELETE: remove bot admin
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// DELETE: remove bot admin (main admin only)
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = getAdminAuth(req);
+  if (!auth || auth.type !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { id } = await params;
     await prisma.botAdmin.delete({ where: { id } });

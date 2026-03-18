@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hashPassword, verifyPassword } from "@/lib/admin-auth";
+import { getAdminAuth, hashPassword, verifyPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
+  const auth = getAdminAuth(req);
+  if (!auth || auth.type !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { currentPassword, newPassword } = await req.json();
 

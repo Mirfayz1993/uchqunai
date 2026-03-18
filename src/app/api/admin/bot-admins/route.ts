@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hashPassword } from "@/lib/admin-auth";
+import { getAdminAuth, hashPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 
-// GET: list all bot admins
-export async function GET() {
+// GET: list all bot admins (main admin only)
+export async function GET(req: NextRequest) {
+  const auth = getAdminAuth(req);
+  if (!auth || auth.type !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const botAdmins = await prisma.botAdmin.findMany({
       select: { id: true, botSlug: true, username: true, createdAt: true, updatedAt: true },
@@ -15,8 +19,12 @@ export async function GET() {
   }
 }
 
-// POST: create bot admin
+// POST: create bot admin (main admin only)
 export async function POST(req: NextRequest) {
+  const auth = getAdminAuth(req);
+  if (!auth || auth.type !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { botSlug, username, password } = await req.json();
 
