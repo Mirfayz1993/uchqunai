@@ -34,7 +34,7 @@ QOIDALAR:
 Foydalanuvchi savoli: ${message.trim()}`;
 
     const response = await gemini.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: { maxOutputTokens: 20 },
     });
