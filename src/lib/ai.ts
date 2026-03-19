@@ -1,15 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
-import Groq from "groq-sdk";
 
 const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
 export type AIMessage = {
   role: "user" | "assistant" | "system";
   content: string;
 };
 
-export async function chatWithGemini(
+export async function chat(
+  _provider: string,
   systemPrompt: string,
   messages: AIMessage[],
   ragContext?: string
@@ -23,93 +22,32 @@ export async function chatWithGemini(
     parts: [{ text: m.content }],
   }));
 
-  const response = await gemini.models.generateContentStream({
-    model: "gemini-2.0-flash",
-    config: {
-      systemInstruction: fullSystemPrompt,
-      maxOutputTokens: 2048,
-    },
-    contents,
-  });
-
-  return new ReadableStream({
-    async start(controller) {
-      for await (const chunk of response) {
-        const text = chunk.text;
-        if (text) {
-          controller.enqueue(text);
-        }
-      }
-      controller.close();
-    },
-  });
-}
-
-export async function chatWithGroq(
-  systemPrompt: string,
-  messages: AIMessage[],
-  ragContext?: string
-): Promise<ReadableStream<string>> {
-  const fullSystemPrompt = ragContext
-    ? `${systemPrompt}\n\nQo'shimcha ma'lumot (bilimlar bazasidan):\n${ragContext}`
-    : systemPrompt;
-
-  const groqMessages = [
-    { role: "system" as const, content: fullSystemPrompt },
-    ...messages.map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
-    })),
-  ];
-
-  const stream = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: groqMessages,
-    max_tokens: 2048,
-    stream: true,
-  });
-
-  return new ReadableStream({
-    async start(controller) {
-      for await (const chunk of stream) {
-        const text = chunk.choices[0]?.delta?.content;
-        if (text) {
-          controller.enqueue(text);
-        }
-      }
-      controller.close();
-    },
-  });
-}
-
-export async function chat(
-  provider: "gemini" | "groq",
-  systemPrompt: string,
-  messages: AIMessage[],
-  ragContext?: string
-): Promise<ReadableStream<string>> {
-  // Try primary provider, fallback to the other one
   try {
-    if (provider === "groq") {
-      return await chatWithGroq(systemPrompt, messages, ragContext);
-    }
-    return await chatWithGemini(systemPrompt, messages, ragContext);
-  } catch (primaryError) {
-    console.error(`${provider} xatosi, zaxira providerga o'tilmoqda:`, primaryError);
-    try {
-      if (provider === "gemini") {
-        return await chatWithGroq(systemPrompt, messages, ragContext);
-      }
-      return await chatWithGemini(systemPrompt, messages, ragContext);
-    } catch (fallbackError) {
-      console.error("Zaxira provider ham ishlamadi:", fallbackError);
-      // Return error as stream
-      return new ReadableStream({
-        start(controller) {
-          controller.enqueue("⚠️ AI xizmati hozir ishlamayapti. Iltimos, keyinroq urinib ko'ring yoki administratorga murojaat qiling.");
-          controller.close();
-        },
-      });
-    }
+    const response = await gemini.models.generateContentStream({
+      model: "gemini-2.0-flash",
+      config: {
+        systemInstruction: fullSystemPrompt,
+        maxOutputTokens: 2048,
+      },
+      contents,
+    });
+
+    return new ReadableStream({
+      async start(controller) {
+        for await (const chunk of response) {
+          const text = chunk.text;
+          if (text) controller.enqueue(text);
+        }
+        controller.close();
+      },
+    });
+  } catch (error) {
+    console.error("Gemini xatosi:", error);
+    return new ReadableStream({
+      start(controller) {
+        controller.enqueue("⚠️ AI xizmati hozir ishlamayapti. Iltimos, keyinroq urinib ko'ring.");
+        controller.close();
+      },
+    });
   }
 }

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import { GoogleGenAI } from "@google/genai";
 import { initialBots } from "@/data/bots";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 const botList = initialBots
   .map((b) => `${b.slug} — ${b.name}: ${b.description}`)
@@ -19,12 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content: `Sen foydalanuvchi savoliga eng mos AI ukani tanlash uchun yordamchisan.
+    const prompt = `Sen foydalanuvchi savoliga eng mos AI ukani tanlash uchun yordamchisan.
 
 Mavjud ukalar:
 ${botList}
@@ -33,28 +28,18 @@ VAZIFA: Foydalanuvchining savoliga eng mos ukaning slug ni qaytar.
 FAQAT slug yoz, boshqa hech narsa yozma.
 
 QOIDALAR:
-- Agar savol aniq bir sohaga tegishli bo'lsa (huquq, soliq, tibbiyot, dasturlash va h.k.) — o'sha ukaning slug ini yoz.
-- Agar savol umumiy bo'lsa, salomlashish bo'lsa, yoki qaysi uka mos kelishi noaniq bo'lsa — "umumiy" deb yoz.
+- Agar savol aniq bir sohaga tegishli bo'lsa — o'sha ukaning slug ini yoz.
+- Agar savol umumiy bo'lsa yoki noaniq bo'lsa — "umumiy" deb yoz.
 
-Misol:
-- "salom" → umumiy
-- "kran oqyapti" → santexnik
-- "mehnat shartnomasi" → huquqshunos
-- "qanday ishlataman" → umumiy
-- "palov retsepti" → oshpaz`,
-        },
-        {
-          role: "user",
-          content: message.trim(),
-        },
-      ],
-      max_tokens: 50,
-      temperature: 0,
+Foydalanuvchi savoli: ${message.trim()}`;
+
+    const response = await gemini.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: { maxOutputTokens: 20 },
     });
 
-    const slug = completion.choices[0]?.message?.content?.trim().toLowerCase() || "umumiy";
-
-    // Find matching bot
+    const slug = response.text?.trim().toLowerCase() || "umumiy";
     const bot = initialBots.find((b) => b.slug === slug);
 
     if (bot) {
@@ -69,7 +54,6 @@ Misol:
       });
     }
 
-    // Umumiy savol — general chat ga yo'naltirish
     return NextResponse.json({
       found: false,
       slug: "umumiy",
