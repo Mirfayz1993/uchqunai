@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import { initialBots } from "@/data/bots";
 
-const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
 const botList = initialBots
   .map((b) => `${b.slug} — ${b.name}: ${b.description}`)
@@ -33,13 +33,13 @@ QOIDALAR:
 
 Foydalanuvchi savoli: ${message.trim()}`;
 
-    const response = await gemini.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: { maxOutputTokens: 20 },
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 20,
     });
 
-    const slug = response.text?.trim().toLowerCase() || "umumiy";
+    const slug = response.choices[0]?.message?.content?.trim().toLowerCase() || "umumiy";
     const bot = initialBots.find((b) => b.slug === slug);
 
     if (bot) {

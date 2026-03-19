@@ -20,7 +20,6 @@ function extractUkaSuggestion(content: string): UkaSuggestion {
 }
 
 function cleanContent(content: string): string {
-  // [ESLATMA:{...}] tagini yashirish
   return content.replace(/\[ESLATMA:\{[^}]*\}\]/g, "").trim();
 }
 
@@ -35,6 +34,136 @@ function extractSavedReminder(content: string): string | null {
   }
 }
 
+// ─── TTS Hook ─────────────────────────────────────────────────────────────────
+function useTTS() {
+  const [speaking, setSpeaking] = useState<number | null>(null);
+
+  function speak(text: string, index: number) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+
+    if (speaking === index) {
+      setSpeaking(null);
+      return;
+    }
+
+    // Markdown belgilerini tozalash
+    const clean = text
+      .replace(/#{1,6}\s/g, "")
+      .replace(/\*\*/g, "")
+      .replace(/\*/g, "")
+      .replace(/`{1,3}[^`]*`{1,3}/g, "")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/\n+/g, ". ")
+      .trim();
+
+    const utt = new SpeechSynthesisUtterance(clean);
+
+    // O'zbek tili mavjud bo'lsa ishlatamiz, yo'qsa rus tiliga fallback
+    const voices = window.speechSynthesis.getVoices();
+    const uzVoice = voices.find((v) => v.lang.startsWith("uz"));
+    const ruVoice = voices.find((v) => v.lang.startsWith("ru"));
+    if (uzVoice) utt.voice = uzVoice;
+    else if (ruVoice) utt.voice = ruVoice;
+    utt.lang = uzVoice ? "uz-UZ" : ruVoice ? "ru-RU" : "en-US";
+    utt.rate = 1;
+    utt.pitch = 1;
+
+    utt.onstart = () => setSpeaking(index);
+    utt.onend = () => setSpeaking(null);
+    utt.onerror = () => setSpeaking(null);
+
+    window.speechSynthesis.speak(utt);
+  }
+
+  function stop() {
+    window.speechSynthesis?.cancel();
+    setSpeaking(null);
+  }
+
+  return { speak, stop, speaking };
+}
+
+// ─── STT Hook ─────────────────────────────────────────────────────────────────
+function useSTT(onResult: (text: string) => void) {
+  const [listening, setListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+
+  const supported =
+    typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+
+  function toggle() {
+    if (!supported) return;
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition: any = new SR();
+    recognition.lang = "uz-UZ";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript;
+      onResult(transcript);
+    };
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  }
+
+  return { toggle, listening, supported };
+}
+
+// ─── Speaker Button ───────────────────────────────────────────────────────────
+function SpeakerButton({
+  text,
+  index,
+  speaking,
+  onSpeak,
+}: {
+  text: string;
+  index: number;
+  speaking: number | null;
+  onSpeak: (text: string, index: number) => void;
+}) {
+  const isActive = speaking === index;
+  return (
+    <button
+      onClick={() => onSpeak(text, index)}
+      title={isActive ? "To'xtatish" : "O'qib berish"}
+      className={`mt-1.5 flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-all duration-200 ${
+        isActive
+          ? "bg-purple-100 dark:bg-[#8b5cf6]/20 text-purple-600 dark:text-[#a78bfa]"
+          : "text-gray-400 dark:text-[#a78bfa]/30 hover:text-purple-500 dark:hover:text-[#a78bfa] hover:bg-purple-50 dark:hover:bg-[#8b5cf6]/10"
+      }`}
+    >
+      {isActive ? (
+        <>
+          <span className="animate-pulse">🔊</span>
+          <span>To&apos;xtatish</span>
+        </>
+      ) : (
+        <>
+          <span>🔈</span>
+          <span>Eshitish</span>
+        </>
+      )}
+    </button>
+  );
+}
 
 type Message = {
   role: "user" | "assistant";
@@ -106,13 +235,23 @@ export function ChatInterface({
   const router = useRouter();
   const { data: session } = useSession();
 
+  const { speak, stop, speaking } = useTTS();
+  const { toggle: toggleMic, listening, supported: sttSupported } = useSTT((text) => {
+    setInput((prev) => (prev ? prev + " " + text : text));
+  });
+
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
 
+  // Stop TTS when component unmounts
+  useEffect(() => () => stop(), [stop]);
+
   const sendMessage = useCallback(
     async (userMessage: string) => {
       if (!userMessage.trim() || loading) return;
+
+      stop(); // TTS ni to'xtatish
 
       setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
       setLoading(true);
@@ -173,7 +312,7 @@ export function ChatInterface({
 
       setLoading(false);
     },
-    [botSlug, conversationId, loading]
+    [botSlug, conversationId, loading, stop]
   );
 
   useEffect(() => {
@@ -263,6 +402,17 @@ export function ChatInterface({
                     <MarkdownMessage content={displayContent} role={msg.role} />
                   </div>
                 </div>
+                {/* TTS button for assistant messages */}
+                {msg.role === "assistant" && displayContent && !loading && (
+                  <div className="flex justify-start">
+                    <SpeakerButton
+                      text={displayContent}
+                      index={i}
+                      speaking={speaking}
+                      onSpeak={speak}
+                    />
+                  </div>
+                )}
                 {savedReminder && (
                   <div className="flex justify-start mt-1">
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200/50 dark:border-green-500/20 text-xs text-green-700 dark:text-green-400">
@@ -311,19 +461,37 @@ export function ChatInterface({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Xabar yozing..."
+                placeholder={listening ? "Gapirayapsiz... 🎤" : "Xabar yozing..."}
                 rows={3}
-                className="resize-none !text-xl sm:!text-2xl border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-36 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[120px]"
+                className="resize-none !text-xl sm:!text-2xl border-0 shadow-none focus-visible:ring-0 bg-transparent p-4 sm:p-5 pb-16 sm:pb-5 sm:pr-44 text-gray-900 dark:text-[#f0e6ff] placeholder:text-gray-400 dark:placeholder:text-[#a78bfa]/40 !field-sizing-normal min-h-[120px]"
                 disabled={loading}
               />
-              <Button
-                onClick={handleSend}
-                disabled={loading || !input.trim()}
-                className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:right-4 sm:left-auto bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] hover:from-purple-500 hover:to-purple-600 dark:hover:from-[#a78bfa] dark:hover:to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(124,58,237,0.2)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 text-sm sm:text-base px-4 sm:px-6 py-4 sm:py-5"
-                size="lg"
-              >
-                {loading ? "Javob yozilmoqda..." : "Yuborish →"}
-              </Button>
+              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:right-4 sm:left-auto flex gap-2 items-center justify-end">
+                {/* Microphone button */}
+                {sttSupported && (
+                  <button
+                    onClick={toggleMic}
+                    disabled={loading}
+                    title={listening ? "Tinglashni to'xtatish" : "Ovozdan matn"}
+                    className={`flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all duration-300 border ${
+                      listening
+                        ? "bg-red-500/10 border-red-400/50 text-red-500 dark:text-red-400 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+                        : "bg-white/50 dark:bg-white/5 border-purple-200/30 dark:border-[#8b5cf6]/20 text-gray-500 dark:text-[#a78bfa]/50 hover:text-purple-600 dark:hover:text-[#a78bfa] hover:border-purple-400/40 dark:hover:border-[#8b5cf6]/40 hover:bg-purple-50 dark:hover:bg-[#8b5cf6]/10"
+                    }`}
+                  >
+                    {listening ? "⏹" : "🎤"}
+                  </button>
+                )}
+                {/* Send button */}
+                <Button
+                  onClick={handleSend}
+                  disabled={loading || !input.trim()}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-[#8b5cf6] dark:to-[#7c3aed] hover:from-purple-500 hover:to-purple-600 dark:hover:from-[#a78bfa] dark:hover:to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(124,58,237,0.2)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 text-sm sm:text-base px-4 sm:px-6 py-4 sm:py-5"
+                  size="lg"
+                >
+                  {loading ? "Javob yozilmoqda..." : "Yuborish →"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
