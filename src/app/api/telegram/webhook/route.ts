@@ -7,16 +7,16 @@ const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOK
 const BOT_LIST = [
   { slug: "umumiy", name: "Umumiy Yordamchi", emoji: "🤖" },
   { slug: "huquqshunos", name: "Huquqshunos", emoji: "⚖️" },
-  { slug: "soliq-maslahatchisi", name: "Soliq Maslahatchisi", emoji: "💰" },
-  { slug: "tibbiy-maslahatchi", name: "Tibbiy Maslahatchi", emoji: "🏥" },
-  { slug: "dasturlash-mentori", name: "Dasturlash Mentori", emoji: "💻" },
-  { slug: "biznes-maslahatchisi", name: "Biznes Maslahatchisi", emoji: "📊" },
-  { slug: "talim-mentori", name: "Ta'lim Mentori", emoji: "📚" },
+  { slug: "bugalter", name: "Bugalter", emoji: "💰" },
+  { slug: "dasturchi", name: "Dasturchi", emoji: "💻" },
+  { slug: "biznesmen", name: "Biznesmen", emoji: "📊" },
+  { slug: "ustoz", name: "Ustoz", emoji: "📚" },
   { slug: "startupchi", name: "Startupchi", emoji: "🚀" },
   { slug: "psixolog", name: "Psixolog", emoji: "🧠" },
-  { slug: "muhandis", name: "Muhandis", emoji: "🔧" },
-  { slug: "moliyachi", name: "Moliyachi", emoji: "📈" },
-  { slug: "hr-mutaxassisi", name: "HR Mutaxassisi", emoji: "👥" },
+  { slug: "oshpaz", name: "Oshpaz", emoji: "🍳" },
+  { slug: "avtomexanik", name: "Avtomexanik", emoji: "🔧" },
+  { slug: "dehqon", name: "Dehqon", emoji: "🌾" },
+  { slug: "santexnik", name: "Santexnik", emoji: "🔩" },
 ];
 
 async function sendMessage(chatId: number, text: string, options: Record<string, unknown> = {}) {
