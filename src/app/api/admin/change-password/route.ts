@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth, hashPassword, verifyPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { changePasswordSchema } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   const auth = getAdminAuth(req);
@@ -8,20 +9,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const { currentPassword, newPassword } = await req.json();
-
-    if (!currentPassword || !newPassword || typeof newPassword !== "string") {
-      return NextResponse.json({ error: "Ma'lumotlar to'liq emas" }, { status: 400 });
+    const body = await req.json().catch(() => null);
+    const parsed = changePasswordSchema.safeParse(body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message ?? "Ma'lumotlar to'liq emas";
+      return NextResponse.json({ error: msg }, { status: 400 });
     }
-    if (newPassword.length < 6 || newPassword.length > 128) {
-      return NextResponse.json({ error: "Parol 6-128 belgi bo'lishi kerak" }, { status: 400 });
-    }
+    const { currentPassword, newPassword } = parsed.data;
 
     // Verify current password
     const setting = await prisma.siteSetting.findUnique({ where: { key: "admin_password_hash" } }).catch(() => null);
     let valid = false;
     if (setting) {
-      valid = verifyPassword(currentPassword, setting.value);
+      valid = await verifyPassword(currentPassword, setting.value);
     } else {
       valid = currentPassword === process.env.ADMIN_PASSWORD;
     }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Save new password hash
-    const newHash = hashPassword(newPassword);
+    const newHash = await hashPassword(newPassword);
     await prisma.siteSetting.upsert({
       where: { key: "admin_password_hash" },
       update: { value: newHash },

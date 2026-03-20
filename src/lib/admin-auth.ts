@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import type { NextRequest } from "next/server";
 
 // ─── Auth Helper (for API routes) ─────────────────────────────────────────
@@ -108,17 +109,13 @@ export function verifyBotAdminToken(token: string): { valid: boolean; botSlug?: 
 
 // ─── Password Hashing ─────────────────────────────────────────────────────
 
-export function hashPassword(password: string): string {
-  return crypto.createHmac("sha256", SECRET).update(password).digest("hex");
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12);
 }
 
-export function verifyPassword(password: string, hash: string): boolean {
-  const expected = hashPassword(password);
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(hash, "hex"),
-      Buffer.from(expected, "hex")
-    );
+    return await bcrypt.compare(password, hash);
   } catch {
     return false;
   }

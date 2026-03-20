@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "./db";
 
 const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
@@ -109,15 +110,11 @@ export async function addDocumentWithChunking(
     for (let i = 0; i < chunks.length; i++) {
       const chunkTitle = `${title} [${i + 1}/${chunks.length}]`;
       const embedding = await generateEmbedding(chunks[i]);
-      const result = await prisma.$queryRawUnsafe<{ id: string }[]>(
-        `INSERT INTO documents (id, bot_id, title, content, embedding, source_url, created_at)
-         VALUES (gen_random_uuid(), $1, $2, $3, $4::vector, $5, NOW())
-         RETURNING id`,
-        botId,
-        chunkTitle,
-        chunks[i],
-        `[${embedding.join(",")}]`,
-        sourceUrl || null
+      const vectorStr = `[${embedding.join(",")}]`;
+      const result = await prisma.$queryRaw<{ id: string }[]>(
+        Prisma.sql`INSERT INTO documents (id, bot_id, title, content, embedding, source_url, created_at)
+         VALUES (gen_random_uuid(), ${botId}, ${chunkTitle}, ${chunks[i]}, ${vectorStr}::vector, ${sourceUrl ?? null}, NOW())
+         RETURNING id`
       );
       if (result[0]?.id) insertedIds.push(result[0].id);
     }
@@ -125,10 +122,8 @@ export async function addDocumentWithChunking(
     // Rollback: delete any chunks that were already inserted
     if (insertedIds.length > 0) {
       try {
-        const placeholders = insertedIds.map((_, i) => `$${i + 1}`).join(",");
-        await prisma.$executeRawUnsafe(
-          `DELETE FROM documents WHERE id IN (${placeholders})`,
-          ...insertedIds
+        await prisma.$executeRaw(
+          Prisma.sql`DELETE FROM documents WHERE id = ANY(${insertedIds}::text[])`
         );
       } catch (cleanupError) {
         console.error("Chunk cleanup xatosi:", cleanupError);
@@ -150,14 +145,10 @@ export async function addDocument(
   const embedding = await generateEmbedding(content);
 
   // Use raw SQL for vector insert since Prisma doesn't support vector type natively
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO documents (id, bot_id, title, content, embedding, source_url, created_at)
-     VALUES (gen_random_uuid(), $1, $2, $3, $4::vector, $5, NOW())`,
-    botId,
-    title,
-    content,
-    `[${embedding.join(",")}]`,
-    sourceUrl || null
+  const vectorStr = `[${embedding.join(",")}]`;
+  await prisma.$executeRaw(
+    Prisma.sql`INSERT INTO documents (id, bot_id, title, content, embedding, source_url, created_at)
+     VALUES (gen_random_uuid(), ${botId}, ${title}, ${content}, ${vectorStr}::vector, ${sourceUrl ?? null}, NOW())`
   );
 }
 
@@ -169,19 +160,17 @@ export async function searchDocuments(
 ): Promise<{ title: string; content: string; similarity: number }[]> {
   const queryEmbedding = await generateEmbedding(query);
 
-  const results = await prisma.$queryRawUnsafe<
+  const vectorStr = `[${queryEmbedding.join(",")}]`;
+  const results = await prisma.$queryRaw<
     { title: string; content: string; similarity: number }[]
   >(
-    `SELECT title, content,
-            1 - (embedding <=> $1::vector) as similarity
+    Prisma.sql`SELECT title, content,
+            1 - (embedding <=> ${vectorStr}::vector) as similarity
      FROM documents
-     WHERE bot_id = $2
+     WHERE bot_id = ${botId}
        AND embedding IS NOT NULL
-     ORDER BY embedding <=> $1::vector
-     LIMIT $3`,
-    `[${queryEmbedding.join(",")}]`,
-    botId,
-    limit
+     ORDER BY embedding <=> ${vectorStr}::vector
+     LIMIT ${limit}`
   );
 
   return results;

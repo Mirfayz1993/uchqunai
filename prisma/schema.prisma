@@ -51,6 +51,9 @@ model Conversation {
   bot       Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
   messages  Message[]
 
+  @@index([userId])
+  @@index([botId])
+  @@index([userId, updatedAt(sort: Desc)])
   @@map("conversations")
 }
 
@@ -62,6 +65,7 @@ model Message {
   createdAt      DateTime     @default(now()) @map("created_at")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
+  @@index([conversationId, createdAt(sort: Asc)])
   @@map("messages")
 }
 
@@ -75,6 +79,7 @@ model Document {
   createdAt DateTime               @default(now()) @map("created_at")
   bot       Bot                    @relation(fields: [botId], references: [id], onDelete: Cascade)
 
+  @@index([botId])
   @@map("documents")
 }
 
@@ -109,6 +114,8 @@ model Reminder {
   createdAt   DateTime @default(now()) @map("created_at")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([notified, remindAt])
   @@map("reminders")
 }
 
@@ -121,5 +128,6 @@ model PushSubscription {
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("push_subscriptions")
 }

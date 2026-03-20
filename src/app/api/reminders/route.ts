@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { reminderCreateSchema } from "@/lib/validation";
 
 // GET: foydalanuvchining barcha eslatmalari
 export async function GET(req: NextRequest) {
@@ -36,19 +37,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title, type, remindAt, isRecurring, recurType } = await req.json();
-
-  if (!title || !type || !remindAt) {
-    return NextResponse.json({ error: "title, type, remindAt majburiy" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  const parsed = reminderCreateSchema.safeParse(body);
+  if (!parsed.success) {
+    const msg = parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
-  if (title.length > 200) {
-    return NextResponse.json({ error: "Sarlavha juda uzun" }, { status: 400 });
-  }
-
-  const validTypes = ["wake_up", "meeting", "birthday", "task", "general"];
-  if (!validTypes.includes(type)) {
-    return NextResponse.json({ error: "Noto'g'ri tur" }, { status: 400 });
-  }
+  const { title, type, remindAt, isRecurring, recurType } = parsed.data;
 
   const reminder = await prisma.reminder.create({
     data: {
@@ -56,8 +51,8 @@ export async function POST(req: NextRequest) {
       title,
       type,
       remindAt: new Date(remindAt),
-      isRecurring: Boolean(isRecurring),
-      recurType: recurType || null,
+      isRecurring,
+      recurType: recurType ?? null,
       notified: false,
     },
   });

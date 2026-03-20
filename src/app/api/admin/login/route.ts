@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminToken, createBotAdminToken, verifyPassword, hashPassword } from "@/lib/admin-auth";
+import { createAdminToken, createBotAdminToken, verifyPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { loginSchema } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,14 +12,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "CSRF xatosi" }, { status: 403 });
     }
 
-    const { username, password } = await req.json();
-
-    if (!username || typeof username !== "string" || username.length > 64) {
-      return NextResponse.json({ error: "Login noto'g'ri" }, { status: 401 });
+    const body = await req.json().catch(() => null);
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Login yoki parol noto'g'ri" }, { status: 401 });
     }
-    if (!password || typeof password !== "string" || password.length > 128) {
-      return NextResponse.json({ error: "Parol noto'g'ri" }, { status: 401 });
-    }
+    const { username, password } = parsed.data;
 
     // ── Main admin login ──────────────────────────────────────────────────
     if (username === "admin") {
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest) {
 
       let valid = false;
       if (setting) {
-        valid = verifyPassword(password, setting.value);
+        valid = await verifyPassword(password, setting.value);
       } else {
         valid = password === process.env.ADMIN_PASSWORD;
       }
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     // ── Bot admin login ───────────────────────────────────────────────────
     const botAdmin = await prisma.botAdmin.findUnique({ where: { username } }).catch(() => null);
-    if (!botAdmin || !verifyPassword(password, botAdmin.passwordHash)) {
+    if (!botAdmin || !await verifyPassword(password, botAdmin.passwordHash)) {
       return NextResponse.json({ error: "Login yoki parol noto'g'ri" }, { status: 401 });
     }
 

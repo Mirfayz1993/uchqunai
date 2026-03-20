@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth, hashPassword } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { botAdminCreateSchema } from "@/lib/validation";
 
 // GET: list all bot admins (main admin only)
 export async function GET(req: NextRequest) {
@@ -26,19 +27,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const { botSlug, username, password } = await req.json();
+    const body = await req.json().catch(() => null);
+    const parsed = botAdminCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message ?? "Barcha maydonlar to'ldirilishi kerak";
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
+    const { botSlug, username, password } = parsed.data;
 
-    if (!botSlug || !username || !password) {
-      return NextResponse.json({ error: "Barcha maydonlar to'ldirilishi kerak" }, { status: 400 });
-    }
-    if (username.length > 64 || password.length < 4 || password.length > 128) {
-      return NextResponse.json({ error: "Username max 64, parol 4-128 belgi" }, { status: 400 });
-    }
     if (username === "admin") {
       return NextResponse.json({ error: "'admin' nomini ishlatib bo'lmaydi" }, { status: 400 });
     }
 
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
     const botAdmin = await prisma.botAdmin.upsert({
       where: { botSlug },
       update: { username, passwordHash },

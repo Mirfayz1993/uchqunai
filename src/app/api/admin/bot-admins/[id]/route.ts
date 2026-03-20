@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Parol 4-128 belgi bo'lishi kerak" }, { status: 400 });
     }
 
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
     await prisma.botAdmin.update({ where: { id }, data: { passwordHash } });
     return NextResponse.json({ success: true });
   } catch {
