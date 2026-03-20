@@ -51,13 +51,13 @@ export async function POST(req: NextRequest) {
   }
   const { message, botSlug, conversationId, clientMessages } = parsed.data;
 
+  const isGuest = !session?.user?.id;
+  const isUmumiy = botSlug === "umumiy";
+
   const bot = await prisma.bot.findUnique({ where: { slug: botSlug } });
   if (!bot) {
     return new Response("Bot topilmadi", { status: 404 });
   }
-
-  const isGuest = !session?.user?.id;
-  const isUmumiy = botSlug === "umumiy";
 
   if (!isUmumiy && isGuest) {
     return new Response("Tizimga kiring", { status: 401 });
@@ -88,25 +88,24 @@ export async function POST(req: NextRequest) {
     messages = [...history, { role: "user", content: message }];
   }
 
-  let ragContext = "";
-  try {
-    ragContext = (await getRagContext(bot.id, message)) ?? "";
-  } catch (ragError) {
-    console.error("RAG xatosi (davom etilmoqda):", ragError);
-  }
-
   const userMessageCount = messages.filter((m) => m.role === "user").length;
   const lastUserMessage = messages.filter((m) => m.role === "user").pop()?.content || "";
   const isDetailedMessage = lastUserMessage.split(/\s+/).length >= 15;
 
-  const systemPrompt = await buildSystemPrompt({
-    basePrompt: bot.systemPrompt,
-    isUmumiy,
-    isGuest,
-    userId: session?.user?.id as string | undefined,
-    userMessageCount,
-    isDetailedMessage,
-  });
+  const [ragContext, systemPrompt] = await Promise.all([
+    getRagContext(bot.id, message).catch((ragError) => {
+      console.error("RAG xatosi (davom etilmoqda):", ragError);
+      return "";
+    }),
+    buildSystemPrompt({
+      basePrompt: bot.systemPrompt,
+      isUmumiy,
+      isGuest,
+      userId: session?.user?.id as string | undefined,
+      userMessageCount,
+      isDetailedMessage,
+    }),
+  ]);
 
   const stream = await chat("gemini", systemPrompt, messages, ragContext);
 
